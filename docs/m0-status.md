@@ -10,9 +10,11 @@ Remote: `github.com/Sendiw14/TinySQL` was empty (`git ls-remote` returned no ref
 |---|---|---|
 | Local git repo, `main` branch, first commit | IMPLEMENTED | `git log` |
 | Canonical prompt + historical audits copied | IMPLEMENTED | `docs/implementation/` |
-| Rust workspace: engine lib, CLI and server stubs | IMPLEMENTED (skeleton only) | `cargo test --workspace --all-targets --offline` → 1 passed, 0 failed (rustc 1.93.1, macOS 27.0.1 arm64) |
+| Rust workspace: engine lib, CLI and server stubs | IMPLEMENTED (skeleton only) | `cargo test --workspace --all-targets --offline` → 1 passed, 0 failed (rustc 1.100.0, macOS 27.0.1 arm64) |
 | Release build | PASS (skeleton) | `cargo build --workspace --release --offline` → finished |
-| `cargo fmt --check`, `cargo clippy -D warnings` | **NOT RUN** | rustfmt and clippy not installed (ADR-10) |
+| Toolchain pin Rust 1.100.0 + rustfmt + clippy | IMPLEMENTED | `rust-toolchain.toml`; installed 2026-11-22 |
+| `cargo fmt --all -- --check` | PASS | rustc 1.100.0, macOS 27.0.1 arm64 |
+| `cargo clippy --workspace --all-targets -- -D warnings` | PASS | same |
 | 12 ADRs | PROPOSED drafts | `docs/decisions/` |
 | Route matrix (11 site + 7 studio) | IMPLEMENTED, generated from the prompt | `scripts/gen-route-matrix.sh --check` → OK |
 | Token contrast check | PASS (token math only) | `node scripts/contrast.mjs` → 32/32 |
@@ -24,7 +26,7 @@ Remote: `github.com/Sendiw14/TinySQL` was empty (`git ls-remote` returned no ref
 - `docs/requirements-matrix.csv` (legacy 174-row reconciliation UNVERIFIED: trackers not available).
 - Threat model (`docs/security.md`), file-format/transaction/API docs derived from approved ADRs.
 - Design: visual reference audit, wireframes for 18 routes × 3 viewports, typefaces/icons with licenses, motion inventory (frontend lane).
-- Toolchain: install Rust 1.100.0 + rustfmt + clippy, Node 26.13.1; cargo-deny; advisory/license check.
+- Toolchain: Node 26.13.1 is installed but `/usr/local/bin/node` (24.11.1) shadows it in PATH; cargo-deny; advisory/license check.
 - Model/effort preflight for the two lanes (master prompt Section 19): UNVERIFIED.
 - CI green on a pushed commit.
 
@@ -35,7 +37,7 @@ Remote: `github.com/Sendiw14/TinySQL` was empty (`git ls-remote` returned no ref
 4. ADR-05: ENOSPC before the COMMIT frame = "not committed"; at/after COMMIT = uncertain.
 5. ADR-06: leftover `.tmp-*` hard link after interrupted creation blocks open until removed manually.
 6. ADR-08: token has no expiry other than server restart.
-7. ADR-10: approve downloading Rust 1.100.0 (+ rustfmt, clippy) and Node 26.13.1; approve `rustix` dependency.
+7. ADR-10: approve the `rustix` dependency. (Toolchain install approved and done 2026-11-22.)
 
 ## Audit finding → ADR coverage
 | Audit | Covered by | State |
@@ -57,5 +59,5 @@ Remote: `github.com/Sendiw14/TinySQL` was empty (`git ls-remote` returned no ref
 | AUD-22 | ADR-03 | drafted |
 | AUD-24 | ADR-01 | drafted |
 
-## Incident
-While pinning `rust-toolchain.toml` to `1.93.1`, `cargo test` made rustup start downloading a separate `1.93.1` toolchain from static.rust-lang.org. It was stopped mid-install and the pin file removed. A partial directory `~/.rustup/toolchains/1.93.1-aarch64-apple-darwin` may remain; `rustup toolchain list` does not show it. Remove with `rustup toolchain uninstall 1.93.1` or let a later install repair it.
+## Incident (resolved)
+Pinning `rust-toolchain.toml` to `1.93.1` made rustup start downloading a separate toolchain. It was stopped; the partial `1.93.1` toolchain was uninstalled on 2026-11-22. Installing 1.100.0 also triggered a rustup self-update (rustup default behavior).

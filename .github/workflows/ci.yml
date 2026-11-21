@@ -13,8 +13,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      # ADR-10: replace with the rust-toolchain.toml pin (1.100.0) once approved.
-      - run: rustup component add rustfmt clippy && rustc --version && cargo --version
+      # rust-toolchain.toml (1.100.0 + rustfmt + clippy) is installed by rustup on first cargo call.
+      - run: rustup show active-toolchain && rustc --version && cargo --version
       - run: cargo fmt --all -- --check
       - run: cargo clippy --workspace --all-targets -- -D warnings
       - run: cargo test --workspace --all-targets

@@ -1,0 +1,5 @@
+# ADR-10: pinned toolchain. MSRV = this pin.
+[toolchain]
+channel = "1.100.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

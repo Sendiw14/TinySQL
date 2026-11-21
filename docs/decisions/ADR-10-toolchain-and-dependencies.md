@@ -1,13 +1,13 @@
 # ADR-10 Exact compatible toolchain and dependency pins
 
-Status: PROPOSED, partly **BLOCKED** (owner approval needed to install toolchains) · Author: Claude Opus 5.5 · Reviewer: owner (pending) · Date: 2026-11-22
+Status: PROPOSED (toolchain install approved by owner 2026-11-22; pins still need ADR review) · Author: Claude Opus 5.5 · Reviewer: owner (pending) · Date: 2026-11-22
 Audit refs: AUD-13, AUD-21
 
 ## Observed (2026-11-22, this machine: macOS 27.0.1 arm64)
 | Tool | Installed | Latest checked | Source checked | Note |
 |---|---|---|---|---|
-| rustc / cargo | 1.93.1 (stable) | 1.100.0 (2026-11-09) | static.rust-lang.org channel-rust-stable.toml | clippy and rustfmt **not installed** |
-| Node.js | 24.11.1 | 26.13.1 LTS | nodejs.org/dist/index.json | |
+| rustc / cargo | 1.100.0 pinned (stable 1.93.1 also present) | 1.100.0 (2026-11-09) | static.rust-lang.org channel-rust-stable.toml | installed 2026-11-22 via rustup with rustfmt + clippy |
+| Node.js | 26.13.1 at `/opt/homebrew/bin/node`; 24.11.1 at `/usr/local/bin/node` comes first in PATH | 26.13.1 LTS | nodejs.org/dist/index.json | `.nvmrc` = 26.13.1; old root-owned .pkg install shadows Homebrew |
 | pnpm | 9.15.9 | not checked | — | |
 | git | 2.54.0 | — | — | |
 | Claude Code | 2.1.319 | — | `claude --version` | ≥ 2.1.284 required for separate Ultracode toggle |
@@ -18,7 +18,7 @@ Advisories, licenses and peer-dependency compatibility: **not checked yet** (UNV
 ## Decision
 ### Rust
 - Pin `rust-toolchain.toml` to `channel = "1.100.0"`, `components = ["rustfmt", "clippy"]`, edition 2024. MSRV = the pin.
-- **Blocked:** installing 1.100.0 downloads a toolchain. Until approved the repo has no `rust-toolchain.toml` and builds with the installed stable 1.93.1 (edition 2024 needs ≥ 1.85, `File::try_lock` needs ≥ 1.89, so both work).
+- Done 2026-11-22: `rust-toolchain.toml` pins 1.100.0 with rustfmt and clippy. `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test`, `cargo build --release` all pass locally.
 - Engine dependencies (M1–M5): none planned. CRC32C is implemented in-crate with the ADR-03 test vectors (about 30 lines). Randomness for UUID/salt/token reads `/dev/urandom` (both supported targets are Unix).
 - Possible additions, each needing its own approval: `rustix` (statfs for the filesystem check, ADR-06; safe wrappers so `unsafe_code = "forbid"` holds), `proptest` (dev-only, model tests).
 - Server (M7a): `axum`, `tokio`, `serde`, `serde_json`. Exact versions chosen and locked at M7a.
