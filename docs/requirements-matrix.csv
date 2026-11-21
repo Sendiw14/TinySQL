@@ -54,7 +54,7 @@ R-052,MUST,P1,a11y,Token contrast pairs meet minimums; rendered contrast recheck
 R-053,MUST,P1,ux,320/375 px and 200%/400% zoom without page-level horizontal scroll,MP §8,M7b-M7c,frontend,,Playwright viewport tests,PROPOSED,,UNVERIFIED
 R-054,MUST,P1,ux,Reduced motion honored for every animated element,MP §8,M7b-M7c,frontend,ADR-11,reduced-motion tests,PROPOSED,,UNVERIFIED
 R-055,LATER,P2,ux,Dark mode,MP §1,later,frontend,,none,DEFERRED,,UNVERIFIED
-R-056,MUST,P0,process,CI green from clean checkout on supported OSes,MP §11,M0,integration,ADR-12,.github/workflows/ci.yml run,PROPOSED,push not authorized,UNVERIFIED
+R-056,MUST,P0,process,CI green from clean checkout on supported OSes,MP §11,M0,integration,ADR-12,.github/workflows/ci.yml run 44954728282 green on 058168d (skeleton only; must stay green each milestone),PASS,,UNVERIFIED
 R-057,MUST,P1,process,Dependency advisory and license checks,MP §11,M0/M8,integration,ADR-10 ADR-12,cargo deny check,PROPOSED,,UNVERIFIED
 R-058,MUST,P0,process,Independent review for recovery/security changes,MP §11 AUD-19,M5/M8,integration,ADR-12,review record per PR,PROPOSED,,UNVERIFIED
 R-059,MUST,P1,docs,README/docs truthful; status labels accurate,MP §14,M8,integration,ADR-12,doc review,PROPOSED,,UNVERIFIED

@@ -3,7 +3,7 @@
 Date: 2026-11-22 · Milestone: **M0 in progress — gate NOT passed**
 Canonical spec: `docs/implementation/master-prompt.md`, v6, sha256 `549a3403f2874266dcc3804eed8b0df73ba55ca6268e51bfb51610657e8c40ea`
 Session: Claude Code 2.1.319, model `claude-opus-5-5`. Effort and Ultracode setting of this session: UNVERIFIED (not inspected).
-Remote: `github.com/Sendiw14/TinySQL` was empty (`git ls-remote` returned no refs, 2026-11-22). Nothing has been pushed.
+Remote: `github.com/Sendiw14/TinySQL`. `main` pushed 2026-11-22 (head `058168d`) with owner approval.
 
 ## Done this session
 | Item | State | Evidence |
@@ -18,7 +18,7 @@ Remote: `github.com/Sendiw14/TinySQL` was empty (`git ls-remote` returned no ref
 | 12 ADRs | PROPOSED drafts | `docs/decisions/` |
 | Route matrix (11 site + 7 studio) | IMPLEMENTED, generated from the prompt | `scripts/gen-route-matrix.sh --check` → OK |
 | Token contrast check | PASS (token math only) | `node scripts/contrast.mjs` → 32/32 |
-| CI workflow | written, **never run** | `.github/workflows/ci.yml` (rust ×2 OS, deny, contracts) |
+| CI workflow | PASS on `058168d`: rust (ubuntu-latest), rust (macos-latest), deny, contracts | https://github.com/Sendiw14/TinySQL/actions/runs/44954728282 |
 | Error-code registry | PROPOSED | `docs/error-codes.md` |
 | SQL goldens: lexer (39), parser M1 (44), generated limits (7), semantics M2 (7 scripts) | PROPOSED | `crates/tinysql-engine/tests/fixtures/sql/` |
 | Binary goldens: genesis, catalog, heap, 4 B+ nodes, WAL valid/torn/corrupt, CRC vectors | PROPOSED | `crates/tinysql-engine/tests/fixtures/format/`; CRCs re-checked by a separate decoder |
@@ -35,7 +35,6 @@ Remote: `github.com/Sendiw14/TinySQL` was empty (`git ls-remote` returned no ref
 ## Still open (cannot be done by this session)
 - **Owner review and approval of all 12 ADRs** and the 7 decisions below. Until then every contract stays PROPOSED and M1 cannot start.
 - **Independent review** of ADR-05 (WAL/recovery) and ADR-08 (security) by a second model session or a human (ADR-12: author cannot sign off).
-- **Push** to GitHub and a green CI run (needs owner permission).
 - **Node PATH**: `/usr/local/bin/node` 24.11.1 (root-owned) shadows Homebrew 26.13.1; needs sudo.
 - **Lane preflight**: start the Sonnet and Opus lane sessions and record `/model`, `/effort`, Ultracode.
 - **Legacy tracker reconciliation** (114/40/20 IDs): source files not available; UNVERIFIED by design.
@@ -43,7 +42,7 @@ Remote: `github.com/Sendiw14/TinySQL` was empty (`git ls-remote` returned no ref
 - `rustix` dependency approval (ADR-06/ADR-10); not needed until M3.
 
 ## M0 gate decision
-**NOT PASSED.** All M0 artifacts now exist in draft, and local checks pass. The gate needs owner approval of the ADRs, a pushed green CI run and independent review of ADR-05/08.
+**NOT PASSED.** All M0 artifacts now exist in draft, and local checks pass. CI is green on the pushed baseline. The gate still needs owner approval of the ADRs and independent review of ADR-05/08.
 
 ## Decisions needing owner input (flagged in ADRs)
 1. ADR-02: INTEGER literal against a REAL column is a type error (`gpa >= 3` fails; `gpa >= 3.0` works).
