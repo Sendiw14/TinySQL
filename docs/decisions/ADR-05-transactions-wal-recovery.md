@@ -1,7 +1,7 @@
 # ADR-05 Transactions, WAL, checkpoint and recovery state machine
 
 Status: PROPOSED — **highest-risk ADR**. WAL fixtures drafted (`wal_*.wal`, `wal_negative_cases.json`) and failpoint matrix in `docs/wal-failpoint-matrix.csv` (39 rows). Still needs an independent high-effort review before any M5 code. The author cannot sign it off.
-Author: Claude Opus 5.5 · Reviewer: owner + independent backend reviewer at high effort (pending) · Date: 2026-11-22
+Author: Sendiw14 · Reviewer: owner + independent backend reviewer at high effort (pending) · Date: 2026-11-22
 Audit refs: AUD-01, AUD-02, AUD-05, AUD-06, AUD-19
 
 ## Context

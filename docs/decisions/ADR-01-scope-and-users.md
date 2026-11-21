@@ -1,6 +1,6 @@
 # ADR-01 Scope and users
 
-Status: PROPOSED · Author: Claude Opus 5.5 (M0 bootstrap session) · Reviewer: repository owner (pending) · Date: 2026-11-22
+Status: PROPOSED · Author: Sendiw14 · Reviewer: repository owner (pending) · Date: 2026-11-22
 Audit refs: AUD-03, AUD-15, AUD-24
 
 ## Context

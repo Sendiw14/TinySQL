@@ -1,6 +1,6 @@
 # ADR-12 Test evidence, CI, release gates and change control
 
-Status: PROPOSED · Author: Claude Opus 5.5 · Reviewer: owner (pending) · Date: 2026-11-22
+Status: PROPOSED · Author: Sendiw14 · Reviewer: owner (pending) · Date: 2026-11-22
 Audit refs: AUD-03, AUD-12, AUD-19, AUD-21, AUD-23
 
 ## Decision

@@ -1,6 +1,6 @@
 # ADR-08 Localhost Host/Origin/token protection and resource ceilings
 
-Status: PROPOSED · Author: Claude Opus 5.5 · Reviewer: owner + independent security review (pending) · Date: 2026-11-22
+Status: PROPOSED · Author: Sendiw14 · Reviewer: owner + independent security review (pending) · Date: 2026-11-22
 Audit refs: AUD-04, AUD-06, AUD-14, AUD-16
 
 ## Decision

@@ -1,6 +1,6 @@
 # ADR-09 Public versus local runtime, build and cache separation
 
-Status: PROPOSED · Author: Claude Opus 5.5 · Reviewer: owner + frontend lead (pending) · Date: 2026-11-22
+Status: PROPOSED · Author: Sendiw14 · Reviewer: owner + frontend lead (pending) · Date: 2026-11-22
 Audit refs: AUD-04, AUD-14
 
 ## Decision

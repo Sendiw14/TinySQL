@@ -1,7 +1,7 @@
 # ADR-07 Versioned lossless JSON and OpenAPI
 
 Status: PROPOSED — `docs/api/openapi.yaml` and 32 fixtures in `docs/api/fixtures/` drafted; all validate (`scripts/check-api-fixtures.py`). Freeze needs owner + frontend review. Studio live integration blocked until then.
-Author: Claude Opus 5.5 · Reviewer: owner + frontend reviewer for Studio flows (pending) · Date: 2026-11-22
+Author: Sendiw14 · Reviewer: owner + frontend reviewer for Studio flows (pending) · Date: 2026-11-22
 Audit refs: AUD-11, AUD-16
 
 ## Decision

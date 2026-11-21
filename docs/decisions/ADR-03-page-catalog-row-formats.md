@@ -1,7 +1,7 @@
 # ADR-03 Page, catalog and row byte formats
 
 Status: PROPOSED — **not frozen**. Golden fixtures drafted 2026-11-22 in `crates/tinysql-engine/tests/fixtures/format/` (generator `scripts/fixtures/fmt.py`; CRCs re-verified by a separate decoder). Freezing requires owner review. M3 code is blocked until then.
-Author: Claude Opus 5.5 · Reviewer: owner + independent backend reviewer (pending) · Date: 2026-11-22
+Author: Sendiw14 · Reviewer: owner + independent backend reviewer (pending) · Date: 2026-11-22
 Audit refs: AUD-02, AUD-09, AUD-10, AUD-22
 
 ## Context

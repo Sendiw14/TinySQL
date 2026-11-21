@@ -1,6 +1,6 @@
 # ADR-10 Exact compatible toolchain and dependency pins
 
-Status: PROPOSED (toolchain install approved by owner 2026-11-22; pins still need ADR review) · Author: Claude Opus 5.5 · Reviewer: owner (pending) · Date: 2026-11-22
+Status: PROPOSED (toolchain install approved by owner 2026-11-22; pins still need ADR review) · Author: Sendiw14 · Reviewer: owner (pending) · Date: 2026-11-22
 Audit refs: AUD-13, AUD-21
 
 ## Observed (2026-11-22, this machine: macOS 27.0.1 arm64)

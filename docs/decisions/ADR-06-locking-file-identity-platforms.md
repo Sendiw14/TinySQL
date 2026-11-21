@@ -1,6 +1,6 @@
 # ADR-06 OS locking, file identity, creation, backup and supported targets
 
-Status: PROPOSED · Author: Claude Opus 5.5 · Reviewer: owner + backend reviewer (pending) · Date: 2026-11-22
+Status: PROPOSED · Author: Sendiw14 · Reviewer: owner + backend reviewer (pending) · Date: 2026-11-22
 Audit refs: AUD-02, AUD-06, AUD-14
 
 ## Decision

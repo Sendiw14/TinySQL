@@ -1,6 +1,6 @@
 # ADR-02 SQL tokens and semantics
 
-Status: PROPOSED · Author: Claude Opus 5.5 · Reviewer: owner + independent reviewer (pending) · Date: 2026-11-22
+Status: PROPOSED · Author: Sendiw14 · Reviewer: owner + independent reviewer (pending) · Date: 2026-11-22
 Audit refs: AUD-07, AUD-08, AUD-16
 
 ## Context

@@ -1,6 +1,6 @@
 # ADR-11 White-first brand, component tokens, authentic assets and motion
 
-Status: PROPOSED · Author: Claude Opus 5.5 (bootstrap; the frontend lead owns the final version) · Reviewer: owner + frontend lead (pending) · Date: 2026-11-22
+Status: PROPOSED · Author: Sendiw14 (the frontend lead owns the final version) · Reviewer: owner + frontend lead (pending) · Date: 2026-11-22
 Audit refs: AUD-17, AUD-20
 
 ## Context
