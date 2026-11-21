@@ -1,6 +1,6 @@
 # ADR-04 B+ key encoding, locators and plan rules
 
-Status: PROPOSED — not frozen; needs node golden fixtures. M4 blocked until approved.
+Status: PROPOSED — not frozen. Node fixtures drafted (`btree_*.bin`). M4 blocked until approved.
 Author: Claude Opus 5.5 · Reviewer: owner + independent backend reviewer (pending) · Date: 2026-11-22
 Audit refs: AUD-09, AUD-10
 

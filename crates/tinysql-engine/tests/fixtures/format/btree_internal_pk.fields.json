@@ -1,0 +1,66 @@
+{
+  "adr": "ADR-04",
+  "header": [
+    [
+      0,
+      1,
+      "page_type",
+      3
+    ],
+    [
+      1,
+      1,
+      "flags",
+      0
+    ],
+    [
+      2,
+      4,
+      "page_id",
+      5
+    ],
+    [
+      6,
+      8,
+      "page_lsn",
+      9
+    ],
+    [
+      14,
+      2,
+      "free_start",
+      56
+    ],
+    [
+      16,
+      2,
+      "free_end",
+      4096
+    ],
+    [
+      18,
+      2,
+      "slot_count",
+      2
+    ],
+    [
+      20,
+      4,
+      "crc32c",
+      "computed"
+    ]
+  ],
+  "leftmost_child": 10,
+  "level": 1,
+  "pairs": [
+    {
+      "separator": "100",
+      "child": 11
+    },
+    {
+      "separator": "200",
+      "child": 12
+    }
+  ],
+  "routing": "key < 100 -> 10; 100 <= key < 200 -> 11; key >= 200 -> 12"
+}

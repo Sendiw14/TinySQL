@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "OPTIONS",
+    "path": "/v1/query",
+    "headers": {
+      "Host": "127.0.0.1:8787",
+      "Origin": "http://127.0.0.1:3100",
+      "Access-Control-Request-Method": "POST",
+      "Access-Control-Request-Headers": "authorization, content-type"
+    }
+  },
+  "status": 204,
+  "body": null,
+  "response_headers": {
+    "Access-Control-Allow-Origin": "http://127.0.0.1:3100",
+    "Access-Control-Allow-Methods": "GET, POST",
+    "Access-Control-Allow-Headers": "Authorization, Content-Type",
+    "Access-Control-Max-Age": "600",
+    "Vary": "Origin"
+  }
+}

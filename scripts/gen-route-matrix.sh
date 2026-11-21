@@ -19,7 +19,10 @@ if [ "${1:-}" = "--check" ]; then
   site=$(grep -c ',site,' "$tmp"); studio=$(grep -c ',studio,' "$tmp")
   [ "$site" -eq 11 ] && [ "$studio" -eq 7 ] || { echo "route count wrong: site=$site studio=$studio"; rm -f "$tmp"; exit 1; }
   cmp -s "$tmp" "$out" || { echo "$out is stale; run scripts/gen-route-matrix.sh"; rm -f "$tmp"; exit 1; }
-  rm -f "$tmp"; echo "route matrix OK: 11 site + 7 studio"
+  for r in $(cut -d, -f1 "$tmp" | tail -n +2); do
+    grep -qF "### \`$r\`" docs/design/wireframes.md || { echo "no wireframe for $r"; rm -f "$tmp"; exit 1; }
+  done
+  rm -f "$tmp"; echo "route matrix OK: 11 site + 7 studio, all wireframed"
 else
   gen > "$out"
 fi

@@ -1,0 +1,96 @@
+{
+  "adr": "ADR-05",
+  "status": "PROPOSED",
+  "file_length": 8352,
+  "header": [
+    [
+      0,
+      8,
+      "magic",
+      "TSQLWAL1"
+    ],
+    [
+      8,
+      2,
+      "wal_version",
+      1
+    ],
+    [
+      10,
+      2,
+      "page_size",
+      4096
+    ],
+    [
+      12,
+      4,
+      "reserved",
+      0
+    ],
+    [
+      16,
+      16,
+      "db_uuid",
+      "00112233445546778899aabbccddeeff"
+    ],
+    [
+      32,
+      8,
+      "base_txid",
+      2
+    ],
+    [
+      40,
+      8,
+      "salt",
+      "0x0123456789ABCDEF"
+    ],
+    [
+      48,
+      12,
+      "reserved",
+      "zero"
+    ],
+    [
+      60,
+      4,
+      "crc32c",
+      "0xAF753CE5"
+    ]
+  ],
+  "frames": [
+    {
+      "frame": "BEGIN",
+      "offset": 64,
+      "length": 20,
+      "crc32c": "0x2AB34A99"
+    },
+    {
+      "frame": "PAGE_IMAGE page 2",
+      "offset": 84,
+      "length": 4120,
+      "crc32c": "0xE962EF92"
+    },
+    {
+      "frame": "PAGE_IMAGE page 0",
+      "offset": 4204,
+      "length": 4120,
+      "crc32c": "0xDCC11EE9"
+    },
+    {
+      "frame": "COMMIT",
+      "offset": 8324,
+      "length": 28,
+      "crc32c": "0x14F26104"
+    }
+  ],
+  "commit": {
+    "image_count": 2,
+    "rolling": "0xB5BAE764"
+  },
+  "page0_image": {
+    "next_page_id": 5,
+    "last_applied_txid": 3
+  },
+  "frame_crc_coverage": "salt (8 bytes LE) || frame bytes [0, 16 + payload_len)"
+}

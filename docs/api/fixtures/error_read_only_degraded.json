@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/query",
+    "headers": {
+      "Host": "127.0.0.1:8787",
+      "Authorization": "Bearer <token>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "sql": "INSERT INTO t (id) VALUES (4)"
+    }
+  },
+  "status": 503,
+  "body": {
+    "api_version": "v1",
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "error": {
+      "category": "commit_outcome",
+      "code": "READ_ONLY_DEGRADED",
+      "message": "writes are refused until the server restarts and recovers",
+      "span": null,
+      "retry": "after_restart",
+      "commit_outcome": "not_committed"
+    }
+  }
+}

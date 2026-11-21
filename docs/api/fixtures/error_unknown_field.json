@@ -1,0 +1,28 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/query",
+    "headers": {
+      "Host": "127.0.0.1:8787",
+      "Authorization": "Bearer <token>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "sql": "SELECT * FROM t",
+      "path": "/etc"
+    }
+  },
+  "status": 400,
+  "body": {
+    "api_version": "v1",
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "error": {
+      "category": "http",
+      "code": "HTTP_BAD_REQUEST",
+      "message": "unknown field: path",
+      "span": null,
+      "retry": "never",
+      "commit_outcome": "not_applicable"
+    }
+  }
+}

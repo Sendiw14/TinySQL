@@ -1,0 +1,40 @@
+id,area,failpoint,precondition,fault,expected_user_status,allowed_states_on_reopen,writes_suspended,recovery_action,adr,test_status
+FP-01,genesis,create tmp file,path and path.wal absent,error,IO_ERROR or NO_SPACE; database not created,no file at path; tmp may exist,n/a,delete tmp manually; retry create,ADR-06,UNVERIFIED
+FP-02,genesis,write page 0/1 to tmp,tmp created,short write / ENOSPC,NO_SPACE or IO_ERROR; not created,no file at path,n/a,retry create,ADR-06,UNVERIFIED
+FP-03,genesis,sync tmp,pages written,error,IO_ERROR; not created,no file at path,n/a,retry create,ADR-06,UNVERIFIED
+FP-04,genesis,hard_link tmp to path,tmp synced,error / kill,error or (kill) none,no file at path OR valid genesis at path plus tmp link,n/a,open reports link count 2 and names tmp to delete,ADR-06,UNVERIFIED
+FP-05,genesis,sync parent directory,link created,error / kill,IO_ERROR,no file at path OR valid genesis,n/a,reopen or retry create,ADR-06,UNVERIFIED
+FP-06,genesis,create races existing file,path created by another process meanwhile,EEXIST from hard_link,ALREADY_EXISTS,other file untouched,n/a,none,ADR-06,UNVERIFIED
+FP-07,wal,create WAL file,no WAL; first write txn,error,statement error IO_ERROR; not committed,previous state,no,retry statement,ADR-05,UNVERIFIED
+FP-08,wal,write WAL header,WAL empty,short write / kill,IO_ERROR; not committed,previous state (WAL < 64 bytes ignored; >= 64 with bad CRC fails closed),no,if open fails CORRUPT_WAL: inspect; see ADR-05 open question 3,ADR-05,UNVERIFIED
+FP-09,wal,sync WAL header,header written,error,IO_ERROR; not committed,previous state,yes (quarantine: fsync error),reopen,ADR-05,UNVERIFIED
+FP-10,wal,write BEGIN frame,header valid,short write / ENOSPC / kill,NO_SPACE or IO_ERROR; not committed,previous state,no; next commit truncates WAL to last valid length first,retry statement,ADR-05,UNVERIFIED
+FP-11,wal,write PAGE_IMAGE frame,BEGIN written,short write / ENOSPC / kill,NO_SPACE or IO_ERROR; not committed,previous state,no; as FP-10,retry statement,ADR-05,UNVERIFIED
+FP-12,wal,write COMMIT frame,all images written,short write / error,COMMIT_OUTCOME_UNCERTAIN,previous OR committed,yes (quarantine),close; reopen; inspect data; never auto-retry,ADR-05,UNVERIFIED
+FP-13,wal,write COMMIT frame,all images written,kill,none (process gone),previous OR committed,n/a,reopen,ADR-05,UNVERIFIED
+FP-14,wal,sync WAL after COMMIT,COMMIT written,error,COMMIT_OUTCOME_UNCERTAIN,previous OR committed,yes (quarantine),close; reopen; inspect,ADR-05,UNVERIFIED
+FP-15,wal,sync WAL after COMMIT,COMMIT written,kill before return,none,previous OR committed,n/a,reopen,ADR-05,UNVERIFIED
+FP-16,checkpoint,write data page to DB,WAL synced (durable),error / short write,success + COMMITTED_CHECKPOINT_DEGRADED,committed,yes (READ_ONLY_DEGRADED),restart: recovery replays WAL,ADR-05,UNVERIFIED
+FP-17,checkpoint,write data page to DB,WAL synced,kill,none,committed,n/a,reopen replays,ADR-05,UNVERIFIED
+FP-18,checkpoint,write page 0 to DB (torn),data pages written,kill mid-write,none,committed (page 0 restored from WAL image),n/a,reopen replays,ADR-05,UNVERIFIED
+FP-19,checkpoint,sync DB,all pages written,error,success + COMMITTED_CHECKPOINT_DEGRADED,committed,yes (READ_ONLY_DEGRADED),restart,ADR-05,UNVERIFIED
+FP-20,checkpoint,sync DB,all pages written,kill,none,committed,n/a,reopen replays,ADR-05,UNVERIFIED
+FP-21,retire,truncate WAL,DB synced,error,success + COMMITTED_CHECKPOINT_DEGRADED,committed,yes (READ_ONLY_DEGRADED),restart (idempotent replay),ADR-05,UNVERIFIED
+FP-22,retire,truncate WAL,DB synced,kill,none,committed,n/a,reopen: idempotent replay then retire,ADR-05,UNVERIFIED
+FP-23,retire,sync WAL after truncate,truncated,error / kill,degraded (error) or none (kill),committed,error: yes,restart,ADR-05,UNVERIFIED
+FP-24,recovery,open with torn WAL tail,crash during FP-11/FP-13,n/a (file state),open succeeds,previous state,no,none; tail discarded,ADR-05,UNVERIFIED
+FP-25,recovery,open with mid-log corruption,valid COMMIT after a bad frame,n/a,CORRUPT_WAL; open refused,unchanged files,yes (no open),restore backup; do not delete WAL blindly,ADR-05,UNVERIFIED
+FP-26,recovery,open with stale WAL (UUID mismatch),WAL from another DB,n/a,CORRUPT_WAL; open refused,unchanged files,yes (no open),move the stray WAL away after inspection,ADR-05,UNVERIFIED
+FP-27,recovery,open with orphan WAL and no DB,DB missing,n/a,NOT_FOUND (open) / ALREADY_EXISTS (create),unchanged,n/a,inspect; never auto-create,ADR-06,UNVERIFIED
+FP-28,recovery,open with superblock behind WAL base_txid,missing transactions,n/a,CORRUPT_WAL,unchanged,yes (no open),restore backup,ADR-05,UNVERIFIED
+FP-29,recovery,torn superblock without WAL page 0,no valid WAL,n/a,CORRUPT_FILE,unchanged,yes (no open),restore backup,ADR-05,UNVERIFIED
+FP-30,recovery,kill during replay page write,replay in progress,kill,none,committed after next reopen,n/a,reopen replays again (idempotent),ADR-05,UNVERIFIED
+FP-31,recovery,replay twice,clean replay done once,repeat open without retire,open succeeds,committed; bytes identical to single replay,no,none,ADR-05,UNVERIFIED
+FP-32,recovery,DB sync after replay,pages replayed,error,IO_ERROR; open refused,committed after a later successful reopen,yes (no open),retry open,ADR-05,UNVERIFIED
+FP-33,state,write after checkpoint degradation,state READ_ONLY_DEGRADED,any write,READ_ONLY_DEGRADED,committed,yes,restart,ADR-05,UNVERIFIED
+FP-34,state,read after checkpoint degradation,state READ_ONLY_DEGRADED,SELECT,rows including the degraded commit,committed,yes (reads allowed),restart,ADR-05,UNVERIFIED
+FP-35,state,any statement after uncertain commit,state QUARANTINED,any statement,QUARANTINED,previous OR committed,yes,close; reopen,ADR-05,UNVERIFIED
+FP-36,lock,second process opens same DB,first holds lock,n/a,LOCKED,unchanged,n/a,close other process,ADR-06,UNVERIFIED
+FP-37,lock,first process killed,lock held,kill,none,last committed state,n/a,reopen (OS releases lock),ADR-06,UNVERIFIED
+FP-38,space,transaction over 1024 dirty pages,large txn,n/a,LIMIT_TXN_DIRTY_PAGES; transaction aborted,previous state,no,split the work,ADR-05,UNVERIFIED
+FP-39,space,page cap reached,262144 pages,allocation,NO_SPACE; not committed,previous state,no,no reclamation in v0.3,ADR-03,UNVERIFIED

@@ -19,9 +19,19 @@ jobs:
       - run: cargo clippy --workspace --all-targets -- -D warnings
       - run: cargo test --workspace --all-targets
       - run: cargo build --workspace --release
+  deny:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: cargo install --locked cargo-deny@0.22.0
+      - run: cargo deny check
   contracts:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: python3 -m venv /tmp/venv && /tmp/venv/bin/pip install PyYAML==6.0.3 jsonschema==4.25.0
+      - run: /tmp/venv/bin/python scripts/fixtures/run.py check
+      - run: /tmp/venv/bin/python scripts/check-api-fixtures.py
+      - run: /tmp/venv/bin/python scripts/release-gate.py --report
       - run: node --version && node scripts/contrast.mjs
       - run: scripts/gen-route-matrix.sh --check

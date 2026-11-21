@@ -9,3 +9,5 @@
 .env.*
 .DS_Store
 .claude/settings.local.json
+!crates/tinysql-engine/tests/fixtures/**/*.tinydb
+!crates/tinysql-engine/tests/fixtures/**/*.wal

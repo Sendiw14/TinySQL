@@ -1,0 +1,557 @@
+{
+  "adr": "ADR-02",
+  "status": "PROPOSED",
+  "cases": [
+    {
+      "name": "keywords_case_insensitive",
+      "sql": "SeLeCt FROM where",
+      "tokens": [
+        [
+          "kw",
+          "SELECT"
+        ],
+        [
+          "kw",
+          "FROM"
+        ],
+        [
+          "kw",
+          "WHERE"
+        ]
+      ]
+    },
+    {
+      "name": "ident_folded_lowercase",
+      "sql": "Students _x9 a",
+      "tokens": [
+        [
+          "ident",
+          "students"
+        ],
+        [
+          "ident",
+          "_x9"
+        ],
+        [
+          "ident",
+          "a"
+        ]
+      ]
+    },
+    {
+      "name": "ident_64_bytes",
+      "sql": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "tokens": [
+        [
+          "ident",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ]
+      ]
+    },
+    {
+      "name": "ident_65_bytes",
+      "sql": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "error": {
+        "code": "SYNTAX_IDENT_TOO_LONG",
+        "span": [
+          0,
+          65
+        ]
+      }
+    },
+    {
+      "name": "integers",
+      "sql": "0 7 007 -0 -12 9223372036854775807 -9223372036854775808",
+      "tokens": [
+        [
+          "int",
+          "0"
+        ],
+        [
+          "int",
+          "7"
+        ],
+        [
+          "int",
+          "7"
+        ],
+        [
+          "int",
+          "0"
+        ],
+        [
+          "int",
+          "-12"
+        ],
+        [
+          "int",
+          "9223372036854775807"
+        ],
+        [
+          "int",
+          "-9223372036854775808"
+        ]
+      ]
+    },
+    {
+      "name": "integer_overflow_pos",
+      "sql": "9223372036854775808",
+      "error": {
+        "code": "SYNTAX_INTEGER_OUT_OF_RANGE",
+        "span": [
+          0,
+          19
+        ]
+      }
+    },
+    {
+      "name": "integer_overflow_neg",
+      "sql": "x -9223372036854775809",
+      "error": {
+        "code": "SYNTAX_INTEGER_OUT_OF_RANGE",
+        "span": [
+          2,
+          22
+        ]
+      }
+    },
+    {
+      "name": "decimals",
+      "sql": "3.85 0.0 -0.0 -1.5 10.25",
+      "tokens": [
+        [
+          "real",
+          "3.85",
+          "0x400ECCCCCCCCCCCD"
+        ],
+        [
+          "real",
+          "0.0",
+          "0x0000000000000000"
+        ],
+        [
+          "real",
+          "-0.0",
+          "0x0000000000000000"
+        ],
+        [
+          "real",
+          "-1.5",
+          "0xBFF8000000000000"
+        ],
+        [
+          "real",
+          "10.25",
+          "0x4024800000000000"
+        ]
+      ]
+    },
+    {
+      "name": "decimal_rounding",
+      "sql": "0.1 2.675",
+      "tokens": [
+        [
+          "real",
+          "0.1",
+          "0x3FB999999999999A"
+        ],
+        [
+          "real",
+          "2.675",
+          "0x4005666666666666"
+        ]
+      ]
+    },
+    {
+      "name": "decimal_no_fraction",
+      "sql": "1.",
+      "error": {
+        "code": "SYNTAX_INVALID_NUMBER",
+        "span": [
+          0,
+          2
+        ]
+      }
+    },
+    {
+      "name": "decimal_no_integer_part",
+      "sql": ".5",
+      "error": {
+        "code": "SYNTAX_INVALID_NUMBER",
+        "span": [
+          0,
+          2
+        ]
+      }
+    },
+    {
+      "name": "exponent_rejected",
+      "sql": "1e3",
+      "error": {
+        "code": "SYNTAX_INVALID_NUMBER",
+        "span": [
+          0,
+          3
+        ]
+      }
+    },
+    {
+      "name": "number_then_letters",
+      "sql": "12abc",
+      "error": {
+        "code": "SYNTAX_INVALID_NUMBER",
+        "span": [
+          0,
+          5
+        ]
+      }
+    },
+    {
+      "name": "minus_without_digits",
+      "sql": "a - 1",
+      "error": {
+        "code": "SYNTAX_INVALID_NUMBER",
+        "span": [
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "name": "plus_sign",
+      "sql": "+1",
+      "error": {
+        "code": "UNSUPPORTED_OPERATOR",
+        "span": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "decimal_overflow",
+      "sql": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111.0",
+      "error": {
+        "code": "SYNTAX_INVALID_NUMBER",
+        "span": [
+          0,
+          402
+        ]
+      }
+    },
+    {
+      "name": "text_simple",
+      "sql": "'Alex'",
+      "tokens": [
+        [
+          "text",
+          "Alex"
+        ]
+      ]
+    },
+    {
+      "name": "text_escape",
+      "sql": "'it''s'",
+      "tokens": [
+        [
+          "text",
+          "it's"
+        ]
+      ]
+    },
+    {
+      "name": "text_empty",
+      "sql": "''",
+      "tokens": [
+        [
+          "text",
+          ""
+        ]
+      ]
+    },
+    {
+      "name": "text_unicode_newline",
+      "sql": "'é\n漢'",
+      "tokens": [
+        [
+          "text",
+          "é\n漢"
+        ]
+      ]
+    },
+    {
+      "name": "text_3000_bytes",
+      "sql": "'éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé'",
+      "tokens": [
+        [
+          "text",
+          "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+        ]
+      ]
+    },
+    {
+      "name": "text_3001_bytes",
+      "sql": "'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'",
+      "error": {
+        "code": "LIMIT_TEXT_TOO_LONG",
+        "span": [
+          0,
+          3003
+        ]
+      }
+    },
+    {
+      "name": "text_unterminated",
+      "sql": "x 'abc",
+      "error": {
+        "code": "SYNTAX_UNTERMINATED_STRING",
+        "span": [
+          2,
+          6
+        ]
+      }
+    },
+    {
+      "name": "punctuation",
+      "sql": "( ) , ; * = != < <= > >=",
+      "tokens": [
+        [
+          "punct",
+          "("
+        ],
+        [
+          "punct",
+          ")"
+        ],
+        [
+          "punct",
+          ","
+        ],
+        [
+          "punct",
+          ";"
+        ],
+        [
+          "punct",
+          "*"
+        ],
+        [
+          "punct",
+          "="
+        ],
+        [
+          "punct",
+          "!="
+        ],
+        [
+          "punct",
+          "<"
+        ],
+        [
+          "punct",
+          "<="
+        ],
+        [
+          "punct",
+          ">"
+        ],
+        [
+          "punct",
+          ">="
+        ]
+      ]
+    },
+    {
+      "name": "punct_no_spaces",
+      "sql": "a>=1",
+      "tokens": [
+        [
+          "ident",
+          "a"
+        ],
+        [
+          "punct",
+          ">="
+        ],
+        [
+          "int",
+          "1"
+        ]
+      ]
+    },
+    {
+      "name": "diamond_operator",
+      "sql": "a <> 1",
+      "error": {
+        "code": "UNSUPPORTED_OPERATOR",
+        "span": [
+          2,
+          4
+        ]
+      }
+    },
+    {
+      "name": "bang_alone",
+      "sql": "a ! 1",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_CHAR",
+        "span": [
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "name": "quoted_ident",
+      "sql": "SELECT \"a\"",
+      "error": {
+        "code": "UNSUPPORTED_QUOTED_IDENT",
+        "span": [
+          7,
+          8
+        ]
+      }
+    },
+    {
+      "name": "whitespace_set",
+      "sql": "a\tb\nc\rd e",
+      "tokens": [
+        [
+          "ident",
+          "a"
+        ],
+        [
+          "ident",
+          "b"
+        ],
+        [
+          "ident",
+          "c"
+        ],
+        [
+          "ident",
+          "d"
+        ],
+        [
+          "ident",
+          "e"
+        ]
+      ]
+    },
+    {
+      "name": "nbsp_rejected",
+      "sql": "a b",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_CHAR",
+        "span": [
+          1,
+          3
+        ]
+      }
+    },
+    {
+      "name": "form_feed_rejected",
+      "sql": "a\fb",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_CHAR",
+        "span": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "name": "line_comment",
+      "sql": "a -- c 'x\nb",
+      "tokens": [
+        [
+          "ident",
+          "a"
+        ],
+        [
+          "ident",
+          "b"
+        ]
+      ]
+    },
+    {
+      "name": "line_comment_eof",
+      "sql": "a --",
+      "tokens": [
+        [
+          "ident",
+          "a"
+        ]
+      ]
+    },
+    {
+      "name": "block_comment",
+      "sql": "a /* x /* y */ b",
+      "tokens": [
+        [
+          "ident",
+          "a"
+        ],
+        [
+          "ident",
+          "b"
+        ]
+      ]
+    },
+    {
+      "name": "block_comment_unterminated",
+      "sql": "a /* x",
+      "error": {
+        "code": "SYNTAX_UNTERMINATED_COMMENT",
+        "span": [
+          2,
+          6
+        ]
+      }
+    },
+    {
+      "name": "comment_end_outside_comment",
+      "sql": "a */",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_CHAR",
+        "span": [
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "name": "semicolon_in_string_ok_then_bad_char",
+      "sql": "'a;b' @",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_CHAR",
+        "span": [
+          6,
+          7
+        ]
+      }
+    },
+    {
+      "name": "invalid_utf8",
+      "sql_hex": "61 20 ff 62",
+      "error": {
+        "code": "SYNTAX_INVALID_UTF8",
+        "span": [
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "name": "invalid_utf8_in_string",
+      "sql_hex": "27 c3 28 27",
+      "error": {
+        "code": "SYNTAX_INVALID_UTF8",
+        "span": [
+          1,
+          2
+        ]
+      }
+    }
+  ]
+}

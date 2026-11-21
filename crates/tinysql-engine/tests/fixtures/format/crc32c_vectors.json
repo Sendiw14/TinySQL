@@ -1,0 +1,24 @@
+{
+  "adr": "ADR-03",
+  "algorithm": "CRC32C Castagnoli, reflected poly 0x82F63B78, init 0xFFFFFFFF, xorout 0xFFFFFFFF",
+  "vectors": [
+    {
+      "input_ascii": "123456789",
+      "crc": "0xE3069283"
+    },
+    {
+      "input_hex_repeat": [
+        "00",
+        32
+      ],
+      "crc": "0x8A9136AA"
+    },
+    {
+      "input_hex_repeat": [
+        "ff",
+        32
+      ],
+      "crc": "0x62A8AB43"
+    }
+  ]
+}

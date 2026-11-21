@@ -1,6 +1,6 @@
 # ADR-05 Transactions, WAL, checkpoint and recovery state machine
 
-Status: PROPOSED — **highest-risk ADR**. Needs WAL golden bytes, the full failpoint matrix as executable test stubs, and an independent high-effort review before any M5 code. The author cannot sign it off.
+Status: PROPOSED — **highest-risk ADR**. WAL fixtures drafted (`wal_*.wal`, `wal_negative_cases.json`) and failpoint matrix in `docs/wal-failpoint-matrix.csv` (39 rows). Still needs an independent high-effort review before any M5 code. The author cannot sign it off.
 Author: Claude Opus 5.5 · Reviewer: owner + independent backend reviewer at high effort (pending) · Date: 2026-11-22
 Audit refs: AUD-01, AUD-02, AUD-05, AUD-06, AUD-19
 
@@ -71,7 +71,7 @@ After any `fsync` error the OS page cache for that file is not trusted (the erro
 ## Recovery (on every open, under the exclusive lock)
 1. Read the WAL. Absent, or length < 64: no pending work. (Safe because the WAL is only truncated after the DB checkpoint is synced, and a new header only precedes new frames.)
 2. Validate header CRC, magic, version, page size. Invalid header with length ≥ 64: `CorruptFile`, fail closed. UUID ≠ superblock UUID (when the superblock is valid): `CorruptFile` ("WAL belongs to another database").
-3. Scan frames. A transaction is complete if BEGIN, its PAGE_IMAGE frames, and a COMMIT with matching count and rolling CRC all validate, and txids are consecutive starting at base_txid + 1.
+3. Scan frames. A transaction is complete if BEGIN, its PAGE_IMAGE frames, and a COMMIT with matching count and rolling CRC all validate, and txids are consecutive starting at base_txid + 1. If the superblock is valid, its last applied txid must be ≥ base_txid; otherwise `CORRUPT_WAL` (transactions are missing).
 4. The first invalid frame ends the scan. If everything after it to end of file is the incomplete tail of **the last** transaction (no later COMMIT is found parseable), it is discarded. If any validly framed COMMIT appears after an invalid frame, that is mid-log corruption: `CorruptFile`, fail closed.
 5. Replay complete transactions in txid order by writing each full page image to its offset. Replay is idempotent; replaying twice gives the same bytes.
 6. `sync_all` DB. Re-read and validate superblock, catalog and index roots. Invalid: `CorruptFile`.

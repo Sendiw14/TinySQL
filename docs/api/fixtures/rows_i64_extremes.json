@@ -1,0 +1,48 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/query",
+    "headers": {
+      "Host": "127.0.0.1:8787",
+      "Authorization": "Bearer <token>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "sql": "SELECT id FROM e ORDER BY id ASC"
+    }
+  },
+  "status": 200,
+  "body": {
+    "api_version": "v1",
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "result": {
+      "kind": "rows",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false
+        }
+      ],
+      "rows": [
+        [
+          "-9223372036854775808"
+        ],
+        [
+          "-1"
+        ],
+        [
+          "0"
+        ],
+        [
+          "9223372036854775807"
+        ]
+      ]
+    },
+    "timing": {
+      "server_elapsed_us": "<decimal string>",
+      "measured": "engine execute, server clock"
+    },
+    "warnings": []
+  }
+}

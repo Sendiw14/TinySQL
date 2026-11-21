@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/query",
+    "headers": {
+      "Host": "127.0.0.1:8787",
+      "Authorization": "Bearer <token>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "sql": "INSERT INTO students (id, name, active) VALUES (1, 'Dup', TRUE)"
+    }
+  },
+  "status": 422,
+  "body": {
+    "api_version": "v1",
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "error": {
+      "category": "constraint",
+      "code": "CONSTRAINT_PRIMARY_KEY",
+      "message": "a row with this primary key already exists",
+      "span": null,
+      "retry": "never",
+      "commit_outcome": "not_committed"
+    }
+  }
+}

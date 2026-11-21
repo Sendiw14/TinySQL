@@ -1,0 +1,101 @@
+{
+  "adr": "ADR-03",
+  "header": [
+    [
+      0,
+      1,
+      "page_type",
+      1
+    ],
+    [
+      1,
+      1,
+      "flags",
+      0
+    ],
+    [
+      2,
+      4,
+      "page_id",
+      1
+    ],
+    [
+      6,
+      8,
+      "page_lsn",
+      3
+    ],
+    [
+      14,
+      2,
+      "free_start",
+      36
+    ],
+    [
+      16,
+      2,
+      "free_end",
+      4010
+    ],
+    [
+      18,
+      2,
+      "slot_count",
+      1
+    ],
+    [
+      20,
+      4,
+      "crc32c",
+      "computed"
+    ]
+  ],
+  "slots": [
+    [
+      4010,
+      86
+    ]
+  ],
+  "record_hex": "010000000873747564656e747305000269640103046e616d6503020367706102000661637469766504020479656172010002000000020000000300000001116964785f73747564656e74735f79656172040004000000",
+  "record": {
+    "table_id": 1,
+    "name": "students",
+    "columns": [
+      {
+        "name": "id",
+        "type": 1,
+        "flags": 3
+      },
+      {
+        "name": "name",
+        "type": 3,
+        "flags": 2
+      },
+      {
+        "name": "gpa",
+        "type": 2,
+        "flags": 0
+      },
+      {
+        "name": "active",
+        "type": 4,
+        "flags": 2
+      },
+      {
+        "name": "year",
+        "type": 1,
+        "flags": 0
+      }
+    ],
+    "heap_first": 2,
+    "heap_last": 2,
+    "pk_root": 3,
+    "has_index": 1,
+    "index": {
+      "name": "idx_students_year",
+      "column": 4,
+      "root": 4
+    }
+  },
+  "note": "PK column flags = 3: PK implies NOT NULL and both bits must be set."
+}

@@ -1,0 +1,25 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/query",
+    "headers": {
+      "Host": "127.0.0.1:8787",
+      "Authorization": "Bearer <token>",
+      "Content-Type": "application/json"
+    },
+    "body_bytes": 1048577
+  },
+  "status": 413,
+  "body": {
+    "api_version": "v1",
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "error": {
+      "category": "http",
+      "code": "HTTP_PAYLOAD_TOO_LARGE",
+      "message": "request body over 1 MiB",
+      "span": null,
+      "retry": "never",
+      "commit_outcome": "not_applicable"
+    }
+  }
+}

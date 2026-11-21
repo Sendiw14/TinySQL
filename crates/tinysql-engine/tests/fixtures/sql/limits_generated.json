@@ -1,0 +1,116 @@
+{
+  "adr": "ADR-02",
+  "status": "PROPOSED",
+  "milestone": "M1",
+  "cases": [
+    {
+      "name": "tokens_at_limit",
+      "build": {
+        "prefix": "SELECT a FROM t WHERE a = 1",
+        "repeat": " OR a = 1",
+        "times": 16382,
+        "suffix": ""
+      },
+      "expect": {
+        "token_count": 65536,
+        "kind": "select"
+      },
+      "check_len": 147465
+    },
+    {
+      "name": "tokens_over_limit",
+      "build": {
+        "prefix": "SELECT a FROM t WHERE a = 1",
+        "repeat": " OR a = 1",
+        "times": 16382,
+        "suffix": ";"
+      },
+      "expect": {
+        "error": {
+          "code": "LIMIT_TOO_MANY_TOKENS",
+          "span": [
+            147465,
+            147466
+          ]
+        }
+      }
+    },
+    {
+      "name": "statement_at_byte_limit",
+      "build": {
+        "prefix": "SELECT a FROM t --",
+        "repeat": "x",
+        "times": 262126,
+        "suffix": ""
+      },
+      "expect": {
+        "kind": "select"
+      },
+      "check_len": 262144
+    },
+    {
+      "name": "statement_over_byte_limit",
+      "build": {
+        "prefix": "SELECT a FROM t --",
+        "repeat": "x",
+        "times": 262127,
+        "suffix": ""
+      },
+      "expect": {
+        "error": {
+          "code": "LIMIT_STATEMENT_TOO_LONG",
+          "span": null
+        }
+      }
+    },
+    {
+      "name": "nesting_at_limit",
+      "build": {
+        "prefix": "SELECT a FROM t WHERE ((((((((((((((((((((((((((((((((",
+        "repeat": "",
+        "times": 0,
+        "suffix": "a = 1))))))))))))))))))))))))))))))))"
+      },
+      "expect": {
+        "kind": "select"
+      },
+      "check_len": 91
+    },
+    {
+      "name": "nesting_over_limit",
+      "build": {
+        "prefix": "SELECT a FROM t WHERE (((((((((((((((((((((((((((((((((",
+        "repeat": "",
+        "times": 0,
+        "suffix": "a = 1)))))))))))))))))))))))))))))))))"
+      },
+      "expect": {
+        "error": {
+          "code": "LIMIT_NESTING_DEPTH",
+          "span": [
+            54,
+            55
+          ]
+        }
+      }
+    },
+    {
+      "name": "not_counts_toward_nesting",
+      "build": {
+        "prefix": "SELECT a FROM t WHERE NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT (NOT ",
+        "repeat": "",
+        "times": 0,
+        "suffix": "a = 1))))))))))))))))"
+      },
+      "expect": {
+        "error": {
+          "code": "LIMIT_NESTING_DEPTH",
+          "span": [
+            102,
+            105
+          ]
+        }
+      }
+    }
+  ]
+}

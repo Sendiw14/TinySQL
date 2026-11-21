@@ -1,0 +1,30 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/query",
+    "headers": {
+      "Host": "127.0.0.1:8787",
+      "Authorization": "Bearer <token>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "sql": "BEGIN"
+    }
+  },
+  "status": 422,
+  "body": {
+    "api_version": "v1",
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "error": {
+      "category": "transaction",
+      "code": "TXN_NOT_OVER_HTTP",
+      "message": "transactions are only available in the CLI; each HTTP statement commits on its own",
+      "span": {
+        "start": 0,
+        "end": 5
+      },
+      "retry": "never",
+      "commit_outcome": "not_applicable"
+    }
+  }
+}

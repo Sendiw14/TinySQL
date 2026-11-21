@@ -1,0 +1,330 @@
+{
+  "adr": "ADR-02",
+  "status": "PROPOSED",
+  "milestone": "M1",
+  "cases": [
+    {
+      "sql": "CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT NOT NULL, gpa REAL, active BOOLEAN NOT NULL, year INTEGER)",
+      "kind": "create_table"
+    },
+    {
+      "sql": "CREATE TABLE t (id INTEGER PRIMARY KEY NOT NULL)",
+      "kind": "create_table"
+    },
+    {
+      "sql": "CREATE INDEX idx_students_year ON students (year)",
+      "kind": "create_index"
+    },
+    {
+      "sql": "INSERT INTO students (id, name, gpa, active, year) VALUES (1, 'Alex', 3.85, TRUE, 2026)",
+      "kind": "insert"
+    },
+    {
+      "sql": "INSERT INTO t (id) VALUES (NULL);",
+      "kind": "insert"
+    },
+    {
+      "sql": "SELECT * FROM t",
+      "kind": "select"
+    },
+    {
+      "sql": "SELECT id, name FROM students WHERE gpa >= 3.50 ORDER BY id ASC LIMIT 50",
+      "kind": "select"
+    },
+    {
+      "sql": "SELECT a FROM t ORDER BY a DESC",
+      "kind": "select"
+    },
+    {
+      "sql": "SELECT a FROM t LIMIT 0",
+      "kind": "select"
+    },
+    {
+      "sql": "SELECT a FROM t WHERE NOT (a = 1 OR a IS NULL) AND b IS NOT NULL",
+      "kind": "select"
+    },
+    {
+      "sql": "SELECT COUNT(*) FROM students WHERE active = TRUE",
+      "kind": "select_count"
+    },
+    {
+      "sql": "SELECT COUNT ( * ) FROM t",
+      "kind": "select_count"
+    },
+    {
+      "sql": "UPDATE students SET gpa = 3.90, year = NULL WHERE id = 1",
+      "kind": "update"
+    },
+    {
+      "sql": "DELETE FROM t WHERE id != 3",
+      "kind": "delete"
+    },
+    {
+      "sql": "BEGIN",
+      "kind": "begin"
+    },
+    {
+      "sql": "COMMIT;",
+      "kind": "commit"
+    },
+    {
+      "sql": "ROLLBACK -- done",
+      "kind": "rollback"
+    },
+    {
+      "sql": "EXPLAIN SELECT * FROM students WHERE id = 1",
+      "kind": "explain"
+    },
+    {
+      "sql": "  /* lead */ SELECT a FROM t ; ",
+      "kind": "select"
+    },
+    {
+      "sql": "",
+      "error": {
+        "code": "SYNTAX_EMPTY_STATEMENT",
+        "span": null
+      }
+    },
+    {
+      "sql": ";",
+      "error": {
+        "code": "SYNTAX_EMPTY_STATEMENT",
+        "span": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "sql": "SELECT a FROM t; SELECT b FROM t",
+      "error": {
+        "code": "SYNTAX_MULTIPLE_STATEMENTS",
+        "span": [
+          17,
+          23
+        ]
+      }
+    },
+    {
+      "sql": "SELECT a FROM t;;",
+      "error": {
+        "code": "SYNTAX_MULTIPLE_STATEMENTS",
+        "span": [
+          16,
+          17
+        ]
+      }
+    },
+    {
+      "sql": "SELECT FROM t",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_TOKEN",
+        "span": [
+          7,
+          11
+        ]
+      }
+    },
+    {
+      "sql": "SELECT a FROM",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_END",
+        "span": [
+          13,
+          13
+        ]
+      }
+    },
+    {
+      "sql": "UPDATE t SET a = 1",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_END",
+        "span": [
+          18,
+          18
+        ]
+      }
+    },
+    {
+      "sql": "DELETE FROM t",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_END",
+        "span": [
+          13,
+          13
+        ]
+      }
+    },
+    {
+      "sql": "SELECT select FROM t",
+      "error": {
+        "code": "SYNTAX_RESERVED_IDENT",
+        "span": [
+          7,
+          13
+        ]
+      }
+    },
+    {
+      "sql": "CREATE TABLE order (id INTEGER PRIMARY KEY)",
+      "error": {
+        "code": "SYNTAX_RESERVED_IDENT",
+        "span": [
+          13,
+          18
+        ]
+      }
+    },
+    {
+      "sql": "SELECT a FROM t JOIN u",
+      "error": {
+        "code": "UNSUPPORTED_KEYWORD",
+        "span": [
+          16,
+          20
+        ]
+      }
+    },
+    {
+      "sql": "SELECT a FROM t GROUP BY a",
+      "error": {
+        "code": "UNSUPPORTED_KEYWORD",
+        "span": [
+          16,
+          21
+        ]
+      }
+    },
+    {
+      "sql": "SELECT a FROM t LIMIT 5 OFFSET 2",
+      "error": {
+        "code": "UNSUPPORTED_KEYWORD",
+        "span": [
+          24,
+          30
+        ]
+      }
+    },
+    {
+      "sql": "DROP TABLE t",
+      "error": {
+        "code": "UNSUPPORTED_KEYWORD",
+        "span": [
+          0,
+          4
+        ]
+      }
+    },
+    {
+      "sql": "SELECT a FROM t WHERE a = b",
+      "error": {
+        "code": "UNSUPPORTED_SYNTAX",
+        "span": [
+          26,
+          27
+        ]
+      }
+    },
+    {
+      "sql": "SELECT a FROM t WHERE 1 = a",
+      "error": {
+        "code": "UNSUPPORTED_SYNTAX",
+        "span": [
+          22,
+          23
+        ]
+      }
+    },
+    {
+      "sql": "SELECT COUNT(*) FROM t LIMIT 1",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_TOKEN",
+        "span": [
+          23,
+          28
+        ]
+      }
+    },
+    {
+      "sql": "SELECT COUNT(a) FROM t",
+      "error": {
+        "code": "UNSUPPORTED_SYNTAX",
+        "span": [
+          13,
+          14
+        ]
+      }
+    },
+    {
+      "sql": "SELECT a FROM t LIMIT -1",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_TOKEN",
+        "span": [
+          22,
+          24
+        ]
+      }
+    },
+    {
+      "sql": "SELECT a FROM t ORDER BY a, b",
+      "error": {
+        "code": "UNSUPPORTED_SYNTAX",
+        "span": [
+          26,
+          27
+        ]
+      }
+    },
+    {
+      "sql": "EXPLAIN DELETE FROM t WHERE id = 1",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_TOKEN",
+        "span": [
+          8,
+          14
+        ]
+      }
+    },
+    {
+      "sql": "CREATE TABLE t (id VARCHAR)",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_TOKEN",
+        "span": [
+          19,
+          26
+        ]
+      }
+    },
+    {
+      "sql": "INSERT INTO t VALUES (1)",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_TOKEN",
+        "span": [
+          14,
+          20
+        ]
+      }
+    },
+    {
+      "sql": "UPDATE t SET a = 1 + 2 WHERE id = 1",
+      "error": {
+        "code": "UNSUPPORTED_OPERATOR",
+        "span": [
+          19,
+          20
+        ]
+      }
+    },
+    {
+      "sql": "SELECT a FROM t WHERE a IS 1",
+      "error": {
+        "code": "SYNTAX_UNEXPECTED_TOKEN",
+        "span": [
+          27,
+          28
+        ]
+      }
+    }
+  ]
+}

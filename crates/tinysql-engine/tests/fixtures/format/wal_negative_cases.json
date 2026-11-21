@@ -1,0 +1,24 @@
+{
+  "adr": "ADR-05",
+  "cases": [
+    {
+      "file": "wal_torn_tail.wal",
+      "expect": "discard incomplete txn 3; DB state = before txn 3"
+    },
+    {
+      "file": "wal_midlog_corrupt.wal",
+      "expect": {
+        "error": "CORRUPT_WAL"
+      },
+      "why": "txn 3 page image corrupt but a valid COMMIT for txn 4 follows"
+    },
+    {
+      "file": "wal_one_txn.wal",
+      "db": "genesis.tinydb",
+      "expect": {
+        "error": "CORRUPT_WAL"
+      },
+      "why": "superblock last_applied_txid 0 < WAL base_txid 2: transactions 1-2 are missing (ADR-05 recovery step 3)"
+    }
+  ]
+}

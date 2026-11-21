@@ -1,0 +1,52 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/v1/schema",
+    "headers": {
+      "Host": "127.0.0.1:8787",
+      "Authorization": "Bearer <token>"
+    }
+  },
+  "status": 200,
+  "body": {
+    "api_version": "v1",
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "tables": [
+      {
+        "name": "students",
+        "columns": [
+          {
+            "name": "id",
+            "type": "INTEGER",
+            "nullable": false
+          },
+          {
+            "name": "name",
+            "type": "TEXT",
+            "nullable": false
+          },
+          {
+            "name": "gpa",
+            "type": "REAL",
+            "nullable": true
+          },
+          {
+            "name": "active",
+            "type": "BOOLEAN",
+            "nullable": false
+          },
+          {
+            "name": "year",
+            "type": "INTEGER",
+            "nullable": true
+          }
+        ],
+        "primary_key": "id",
+        "index": {
+          "name": "idx_students_year",
+          "column": "year"
+        }
+      }
+    ]
+  }
+}

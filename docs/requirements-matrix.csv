@@ -1,0 +1,62 @@
+id,priority,severity,area,requirement,source,milestone,owner,adr,acceptance,status,blocker,legacy_ids
+R-001,MUST,P0,sql,Custom lexer with bounded tokens/depth and byte spans,MP §3,M1,backend,ADR-02,lexer.json + limits_generated.json + fuzz no panic,PROPOSED,ADR-02 review,UNVERIFIED
+R-002,MUST,P0,sql,Parser for exact v0.3 EBNF; unsupported syntax typed errors,MP §3,M1,backend,ADR-02,parse_m1.json all cases,PROPOSED,ADR-02 review,UNVERIFIED
+R-003,MUST,P0,sql,Binder resolves names and strict types before execution,MP §3-4,M1,backend,ADR-02,semantics_m2.json strict_types_and_constraints,PROPOSED,ADR-02 review,UNVERIFIED
+R-004,MUST,P0,sql,Three-valued logic; only TRUE passes WHERE,MP §3,M2,backend,ADR-02,semantics_m2.json null_three_valued_logic,PROPOSED,,UNVERIFIED
+R-005,MUST,P0,sql,ORDER BY NULLs last; ties by PK; LIMIT 0; unordered compares as multiset,MP §3,M2,backend,ADR-02,semantics_m2.json ordering_nulls_last_ties_by_pk,PROPOSED,,UNVERIFIED
+R-006,MUST,P0,sql,COUNT(*) with optional WHERE,MP §3,M2,backend,ADR-02,semantics_m2.json reference_journey_m2,PROPOSED,,UNVERIFIED
+R-007,MUST,P0,sql,Exactly one INTEGER PK; PK update prohibited; NOT NULL enforced,MP §3,M2,backend,ADR-02,semantics_m2.json schema_rules + strict_types_and_constraints,PROPOSED,,UNVERIFIED
+R-008,MUST,P0,sql,UPDATE/DELETE require WHERE and are all-or-nothing,MP §3-4,M2,backend,ADR-02,semantics_m2.json multi_row_mutation_atomic,PROPOSED,,UNVERIFIED
+R-009,MUST,P0,sql,Resource caps: 256 KiB SQL; 64 cols; 128 tables; 3000-byte row; 10k rows,MP §3 §10,M2,backend,ADR-02 ADR-08,limits_generated.json + cap tests,PROPOSED,,UNVERIFIED
+R-010,MUST,P0,txn,Explicit transactions; read-your-writes; ROLLBACK; aborted-until-rollback policy,MP §4-5,M2,backend,ADR-02,semantics_m2.json transaction_aborted_until_rollback,PROPOSED,owner decision 2,UNVERIFIED
+R-011,MUST,P0,txn,DDL rejected inside explicit transactions; DDL atomic,MP §3,M2,backend,ADR-02,semantics_m2.json transaction_aborted_until_rollback,PROPOSED,,UNVERIFIED
+R-012,MUST,P0,storage,4096-byte pages; LE codecs; CRC32C; superblock per ADR-03,MP §5,M3,backend,ADR-03,format/*.bin byte-equal encode and decode,PROPOSED,ADR-03 review,UNVERIFIED
+R-013,MUST,P0,storage,Slotted heap rows; tombstones; NULL bitmap,MP §5,M3,backend,ADR-03,format/heap_page.bin,PROPOSED,ADR-03 review,UNVERIFIED
+R-014,MUST,P0,storage,Catalog pages; reopen restores schema and rows,MP §5,M3,backend,ADR-03,format/catalog_page.bin + reopen.rs,PROPOSED,ADR-03 review,UNVERIFIED
+R-015,MUST,P0,storage,Corrupt/truncated/unknown-version files fail closed,MP §5,M3,backend,ADR-03,corruption suite,PROPOSED,,UNVERIFIED
+R-016,MUST,P0,storage,Crash-safe genesis; never mistake partial creation for empty DB,MP §5 AUD-02,M3,backend,ADR-06,FP-01..FP-06,PROPOSED,ADR-06 review,UNVERIFIED
+R-017,MUST,P1,storage,Bounded space; NoSpace error; no silent loss,MP §5 AUD-10,M3,backend,ADR-03,FP-39,PROPOSED,,UNVERIFIED
+R-018,MUST,P0,index,PK B+ tree with splits and sibling links,MP §5,M4,backend,ADR-04,model test vs BTreeMap + format/btree_*.bin,PROPOSED,ADR-04 review,UNVERIFIED
+R-019,MUST,P0,index,Optional secondary INTEGER index (value; pk); NULL not indexed,MP §5,M4,backend,ADR-04,format/btree_leaf_secondary.bin + differential test,PROPOSED,ADR-04 review,UNVERIFIED
+R-020,MUST,P0,index,Signed i64 ordering correct at extremes,MP §5,M4,backend,ADR-04,format/btree_leaf_pk_extremes.bin,PROPOSED,,UNVERIFIED
+R-021,MUST,P0,index,Lazy delete; reinsertion never resurrects stale locators,MP §5,M4,backend,ADR-04,model test,PROPOSED,,UNVERIFIED
+R-022,MUST,P0,query,Deterministic plan rules; EXPLAIN equals executed plan; no mutation,MP §3,M4,backend,ADR-04,plan identity test + api plan fixtures,PROPOSED,,UNVERIFIED
+R-023,MUST,P0,txn,Redo WAL bytes per ADR-05; WAL sync is durability boundary,MP §5,M5,backend,ADR-05,format/wal_*.wal,PROPOSED,ADR-05 high-effort review,UNVERIFIED
+R-024,MUST,P0,txn,Recovery replays complete txns; rejects mid-log corruption; idempotent,MP §5,M5,backend,ADR-05,FP-24..FP-32 + wal_negative_cases.json,PROPOSED,ADR-05 review,UNVERIFIED
+R-025,MUST,P0,txn,Checkpoint degraded: committed + read-only until restart,MP §5 AUD-05,M5,backend,ADR-05,FP-16..FP-23 FP-33 FP-34,PROPOSED,,UNVERIFIED
+R-026,MUST,P0,txn,Uncertain commit never reported as rollback; quarantine; no auto-retry,MP §5,M5,backend,ADR-05,FP-12..FP-15 FP-35,PROPOSED,,UNVERIFIED
+R-027,MUST,P0,platform,Exclusive OS lock; second open fails LOCKED,MP §5,M5,backend,ADR-06,FP-36 FP-37,PROPOSED,,UNVERIFIED
+R-028,MUST,P1,platform,Reject symlink/hard link/network FS paths,MP §5,M3,backend,ADR-06,path tests,PROPOSED,rustix approval,UNVERIFIED
+R-029,MUST,P0,cli,CLI shell: dot commands; multiline; typed errors; clean EOF,MP §6,M6,backend,,CLI journey J1 script,PROPOSED,,UNVERIFIED
+R-030,MUST,P0,cli,Journey J1 completes including reopen,MP §1,M6,backend,ADR-01,scripts/smoke.sh,PROPOSED,,UNVERIFIED
+R-031,SHOULD,P2,perf,Reproducible benchmark harness 1k/10k/100k,MP §10,M6,backend,,benchmarks.md with real output,PROPOSED,,UNVERIFIED
+R-032,MUST,P0,api,Exactly 3 routes under /v1; one statement per request; no HTTP transactions,MP §6,M7a,backend,ADR-07,api fixtures + negative tests,PROPOSED,ADR-07 review,UNVERIFIED
+R-033,MUST,P0,api,INTEGER and 64-bit counts as decimal strings,MP §6,M7a,backend,ADR-07,rows_i64_extremes.json + check_integers,PROPOSED,,UNVERIFIED
+R-034,MUST,P0,security,Loopback bind only; Host and Origin checks; DNS rebinding blocked,MP §6,M7a,backend,ADR-08,error_host_rebinding.json + error_origin.json + bind test,PROPOSED,ADR-08 review,UNVERIFIED
+R-035,MUST,P0,security,Startup bearer token on every route; constant-time compare; never logged,MP §6,M7a,backend,ADR-08,error_unauthorized.json + log grep test,PROPOSED,,UNVERIFIED
+R-036,MUST,P0,api,Bounded queue; typed busy; one engine owner,MP §6 AUD-06,M7a,backend,ADR-08,error_busy.json + contention test,PROPOSED,,UNVERIFIED
+R-037,MUST,P1,api,Body/response/work limits with typed errors,MP §10 AUD-16,M7a,backend,ADR-08,limit tests N and N+1,PROPOSED,,UNVERIFIED
+R-038,MUST,P0,api,Safe error envelope; no stack/token/path/literal leaks,MP §6,M7a,backend,ADR-07,error fixtures + leak test,PROPOSED,,UNVERIFIED
+R-039,MUST,P0,studio,7 Studio routes functional against real engine,MP §7B,M7b,frontend,ADR-09,Playwright with real Rust server,PROPOSED,,UNVERIFIED
+R-040,MUST,P0,studio,Token in memory only; gone on reload,MP §6,M7b,frontend,ADR-08,Playwright storage inspection,PROPOSED,,UNVERIFIED
+R-041,MUST,P0,studio,No duplicate mutation submit; uncertain-commit panel,MP §6 §8,M7b,frontend,ADR-07,Playwright with failpoint server,PROPOSED,,UNVERIFIED
+R-042,MUST,P1,studio,CodeMirror editor plus accessible textarea fallback,MP §7B §9,M7b,frontend,ADR-11,keyboard + axe tests,PROPOSED,,UNVERIFIED
+R-043,MUST,P0,studio,Journey J2 completes,MP §1,M7b,frontend,ADR-01,E2E J2,PROPOSED,,UNVERIFIED
+R-044,SHOULD,P2,studio,Session-only query history (opt-in),MP §7B,M7b,frontend,,Playwright,PROPOSED,,UNVERIFIED
+R-045,MUST,P0,site,11 public routes static with real content,MP §7A,M7c,frontend,ADR-09,route-matrix.csv + nav tests,PROPOSED,,UNVERIFIED
+R-046,MUST,P0,security,Public artifact has no localhost/API/token/Studio code,MP §1 §6,M7c,frontend,ADR-09,scripts/check-static-artifact.sh + network log,PROPOSED,,UNVERIFIED
+R-047,MUST,P0,site,Journey J3 completes; quickstart verified from clean clone,MP §1,M7c,frontend,ADR-01,E2E J3 + clean clone run,PROPOSED,,UNVERIFIED
+R-048,MUST,P1,site,Sitemap/robots/OG/canonical/404/metadata,MP §7A,M7c,frontend,,metadata checks,PROPOSED,,UNVERIFIED
+R-049,MUST,P1,site,Changelog honest pre-release status,MP §7A,M7c,frontend,,content review,PROPOSED,,UNVERIFIED
+R-050,SHOULD,P2,site,Teaching diagrams with accessible stepping,MP §7A §8,M7c,frontend,ADR-11,keyboard + reduced-motion tests,PROPOSED,,UNVERIFIED
+R-051,MUST,P1,a11y,WCAG 2.2 AA target; no serious/critical axe issues in essential flows,MP §9,M7b-M7c,frontend,ADR-11,axe + manual keyboard; VoiceOver if available,PROPOSED,,UNVERIFIED
+R-052,MUST,P1,a11y,Token contrast pairs meet minimums; rendered contrast rechecked,MP §8,M0/M7,frontend,ADR-11,scripts/contrast.mjs (token math PASS 32/32 2026-11-22),PROPOSED,rendered check pending,UNVERIFIED
+R-053,MUST,P1,ux,320/375 px and 200%/400% zoom without page-level horizontal scroll,MP §8,M7b-M7c,frontend,,Playwright viewport tests,PROPOSED,,UNVERIFIED
+R-054,MUST,P1,ux,Reduced motion honored for every animated element,MP §8,M7b-M7c,frontend,ADR-11,reduced-motion tests,PROPOSED,,UNVERIFIED
+R-055,LATER,P2,ux,Dark mode,MP §1,later,frontend,,none,DEFERRED,,UNVERIFIED
+R-056,MUST,P0,process,CI green from clean checkout on supported OSes,MP §11,M0,integration,ADR-12,.github/workflows/ci.yml run,PROPOSED,push not authorized,UNVERIFIED
+R-057,MUST,P1,process,Dependency advisory and license checks,MP §11,M0/M8,integration,ADR-10 ADR-12,cargo deny check,PROPOSED,,UNVERIFIED
+R-058,MUST,P0,process,Independent review for recovery/security changes,MP §11 AUD-19,M5/M8,integration,ADR-12,review record per PR,PROPOSED,,UNVERIFIED
+R-059,MUST,P1,docs,README/docs truthful; status labels accurate,MP §14,M8,integration,ADR-12,doc review,PROPOSED,,UNVERIFIED
+R-060,MUST,P1,process,Release artifacts with checksums; owner-approved release,MP §14,M8,integration,ADR-12,release checklist,PROPOSED,,UNVERIFIED
+R-061,LATER,P2,scope,JOIN; GROUP BY; ALTER/DROP; MVCC; pagination; cloud DB; accounts,MP §1,later,none,ADR-01,must stay absent,DEFERRED,,UNVERIFIED

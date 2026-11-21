@@ -1,0 +1,12 @@
+{
+  "adr": "ADR-04",
+  "right_sibling": 8,
+  "keys_in_order": [
+    "-9223372036854775808",
+    "-1",
+    "0",
+    "1",
+    "9223372036854775807"
+  ],
+  "note": "keys are stored LE i64 and compared as signed integers; this order must survive decode+sort"
+}

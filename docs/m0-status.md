@@ -18,17 +18,32 @@ Remote: `github.com/Sendiw14/TinySQL` was empty (`git ls-remote` returned no ref
 | 12 ADRs | PROPOSED drafts | `docs/decisions/` |
 | Route matrix (11 site + 7 studio) | IMPLEMENTED, generated from the prompt | `scripts/gen-route-matrix.sh --check` → OK |
 | Token contrast check | PASS (token math only) | `node scripts/contrast.mjs` → 32/32 |
-| CI workflow | written, **never run** | `.github/workflows/ci.yml` |
+| CI workflow | written, **never run** | `.github/workflows/ci.yml` (rust ×2 OS, deny, contracts) |
+| Error-code registry | PROPOSED | `docs/error-codes.md` |
+| SQL goldens: lexer (39), parser M1 (44), generated limits (7), semantics M2 (7 scripts) | PROPOSED | `crates/tinysql-engine/tests/fixtures/sql/` |
+| Binary goldens: genesis, catalog, heap, 4 B+ nodes, WAL valid/torn/corrupt, CRC vectors | PROPOSED | `crates/tinysql-engine/tests/fixtures/format/`; CRCs re-checked by a separate decoder |
+| Fixture freshness + code registry check | PASS | `python3 scripts/fixtures/run.py check` |
+| WAL failpoint matrix (39 rows) | PROPOSED | `docs/wal-failpoint-matrix.csv` |
+| OpenAPI + 32 API fixtures | PROPOSED; 32/32 validate | `python3 scripts/check-api-fixtures.py` |
+| Requirements matrix (61 rows, 56 MUST) | PROPOSED | `python3 scripts/release-gate.py --report`; full gate correctly exits 1 |
+| Threat model (16 threats) | PROPOSED | `docs/security.md` |
+| Design system, reference audit, wireframes (18 routes × 3 viewports), motion inventory | PROPOSED | `docs/design/`; wireframe coverage checked by `gen-route-matrix.sh --check` |
+| Font/icon licenses | checked on npm 2026-11-22 | Instrument Sans + JetBrains Mono OFL-1.1, Lucide ISC |
+| Model/tool preflight | partial | `docs/model-preflight.md` |
+| `cargo deny check` (cargo-deny 0.22.0) | PASS: advisories, bans, licenses, sources ok (zero dependencies) | `deny.toml` |
 
-## Not done (remaining M0 outputs)
-- ADR review and approval by the owner (all 12).
-- Golden fixtures: SQL lexical corpus (ADR-02), binary pages + CRC (ADR-03), B+ nodes (ADR-04), WAL frames + failpoint stubs (ADR-05), API JSON + `openapi.yaml` (ADR-07).
-- `docs/requirements-matrix.csv` (legacy 174-row reconciliation UNVERIFIED: trackers not available).
-- Threat model (`docs/security.md`), file-format/transaction/API docs derived from approved ADRs.
-- Design: visual reference audit, wireframes for 18 routes × 3 viewports, typefaces/icons with licenses, motion inventory (frontend lane).
-- Toolchain: Node 26.13.1 is installed but `/usr/local/bin/node` (24.11.1) shadows it in PATH; cargo-deny; advisory/license check.
-- Model/effort preflight for the two lanes (master prompt Section 19): UNVERIFIED.
-- CI green on a pushed commit.
+## Still open (cannot be done by this session)
+- **Owner review and approval of all 12 ADRs** and the 7 decisions below. Until then every contract stays PROPOSED and M1 cannot start.
+- **Independent review** of ADR-05 (WAL/recovery) and ADR-08 (security) by a second model session or a human (ADR-12: author cannot sign off).
+- **Push** to GitHub and a green CI run (needs owner permission).
+- **Node PATH**: `/usr/local/bin/node` 24.11.1 (root-owned) shadows Homebrew 26.13.1; needs sudo.
+- **Lane preflight**: start the Sonnet and Opus lane sessions and record `/model`, `/effort`, Ultracode.
+- **Legacy tracker reconciliation** (114/40/20 IDs): source files not available; UNVERIFIED by design.
+- **Visual mockups** beyond text wireframes, and live re-inspection of the reference sites (frontend lane).
+- `rustix` dependency approval (ADR-06/ADR-10); not needed until M3.
+
+## M0 gate decision
+**NOT PASSED.** All M0 artifacts now exist in draft, and local checks pass. The gate needs owner approval of the ADRs, a pushed green CI run and independent review of ADR-05/08.
 
 ## Decisions needing owner input (flagged in ADRs)
 1. ADR-02: INTEGER literal against a REAL column is a type error (`gpa >= 3` fails; `gpa >= 3.0` works).

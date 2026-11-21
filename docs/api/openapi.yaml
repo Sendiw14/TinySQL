@@ -1,0 +1,219 @@
+openapi: 3.1.0
+info:
+  title: TINYSQL local API
+  version: api-v1-alpha-1
+  description: |
+    PROPOSED (ADR-07, ADR-08). Loopback only (127.0.0.1). Every route needs the startup bearer token.
+    Host must be 127.0.0.1:<port> or localhost:<port>. Origin, when present, must be an allowed Studio origin.
+    SQL INTEGER values and all 64-bit counts are decimal strings. Golden examples: docs/api/fixtures/.
+servers:
+  - url: http://127.0.0.1:8787
+security:
+  - bearer: []
+paths:
+  /v1/health:
+    get:
+      operationId: health
+      responses:
+        "200": { description: Engine state, content: { application/json: { schema: { $ref: "#/components/schemas/Health" } } } }
+        "401": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+  /v1/schema:
+    get:
+      operationId: schema
+      responses:
+        "200": { description: Tables and indexes, content: { application/json: { schema: { $ref: "#/components/schemas/Schema" } } } }
+        "401": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+  /v1/query:
+    options:
+      operationId: preflight
+      security: []
+      description: CORS preflight from an allowed Studio origin. No engine call, no token.
+      responses:
+        "204": { description: Allowed }
+        "403": { $ref: "#/components/responses/Error" }
+    post:
+      operationId: query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/QueryRequest" }
+      responses:
+        "200": { description: Statement result, content: { application/json: { schema: { $ref: "#/components/schemas/QuerySuccess" } } } }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "413": { $ref: "#/components/responses/Error" }
+        "415": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        "429": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+        "507": { $ref: "#/components/responses/Error" }
+components:
+  securitySchemes:
+    bearer: { type: http, scheme: bearer }
+  responses:
+    Error:
+      description: Error envelope
+      content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } }
+  schemas:
+    I64String:
+      type: string
+      pattern: "^-?(0|[1-9][0-9]*)$"
+      description: Signed 64-bit integer as a decimal string. Range -9223372036854775808..9223372036854775807.
+    SqlType: { type: string, enum: [INTEGER, REAL, TEXT, BOOLEAN] }
+    Column:
+      type: object
+      additionalProperties: false
+      required: [name, type, nullable]
+      properties:
+        name: { type: string }
+        type: { $ref: "#/components/schemas/SqlType" }
+        nullable: { type: boolean }
+    Cell:
+      description: Meaning comes from the column type. INTEGER is I64String, REAL a finite number, TEXT a string, BOOLEAN a boolean.
+      oneOf:
+        - { type: "null" }
+        - { type: string }
+        - { type: number }
+        - { type: boolean }
+    QueryRequest:
+      type: object
+      additionalProperties: false
+      required: [sql]
+      properties:
+        sql: { type: string, maxLength: 262144, description: One statement. BEGIN/COMMIT/ROLLBACK are rejected. }
+    RowsResult:
+      type: object
+      additionalProperties: false
+      required: [kind, columns, rows]
+      properties:
+        kind: { const: rows }
+        columns: { type: array, items: { $ref: "#/components/schemas/Column" } }
+        rows: { type: array, maxItems: 10000, items: { type: array, items: { $ref: "#/components/schemas/Cell" } } }
+    AffectedResult:
+      type: object
+      additionalProperties: false
+      required: [kind, rows]
+      properties:
+        kind: { const: affected }
+        rows: { $ref: "#/components/schemas/I64String" }
+    DdlResult:
+      type: object
+      additionalProperties: false
+      required: [kind, object, name]
+      properties:
+        kind: { const: ddl }
+        object: { type: string, enum: [table, index] }
+        name: { type: string }
+    PlanResult:
+      type: object
+      additionalProperties: false
+      required: [kind, plan, text]
+      properties:
+        kind: { const: plan }
+        text: { type: string }
+        plan:
+          type: object
+          additionalProperties: false
+          required: [table, access, residual, sort, projection, limit]
+          properties:
+            table: { type: string }
+            access:
+              type: object
+              required: [type]
+              properties:
+                type: { type: string, enum: [heap_scan, pk_lookup, pk_range, index_lookup, index_range] }
+                column: { type: string }
+                op: { type: string, enum: ["=", "<", "<=", ">", ">="] }
+                value: { $ref: "#/components/schemas/I64String" }
+                bounds: { type: array, items: { type: object } }
+            residual: { type: [string, "null"] }
+            sort:
+              oneOf:
+                - { type: "null" }
+                - { type: object, required: [column, direction], properties: { column: { type: string }, direction: { enum: [ASC, DESC] } } }
+            projection: { type: array, items: { type: string } }
+            limit: { oneOf: [ { type: "null" }, { $ref: "#/components/schemas/I64String" } ] }
+    Warning:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, enum: [COMMITTED_CHECKPOINT_DEGRADED] }
+        message: { type: string }
+    QuerySuccess:
+      type: object
+      additionalProperties: false
+      required: [api_version, request_id, result, timing, warnings]
+      properties:
+        api_version: { const: v1 }
+        request_id: { type: string, format: uuid }
+        result:
+          oneOf:
+            - { $ref: "#/components/schemas/RowsResult" }
+            - { $ref: "#/components/schemas/AffectedResult" }
+            - { $ref: "#/components/schemas/DdlResult" }
+            - { $ref: "#/components/schemas/PlanResult" }
+        timing:
+          type: object
+          required: [server_elapsed_us, measured]
+          properties:
+            server_elapsed_us: { $ref: "#/components/schemas/I64String" }
+            measured: { type: string }
+        warnings: { type: array, items: { $ref: "#/components/schemas/Warning" } }
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      required: [api_version, request_id, error]
+      properties:
+        api_version: { const: v1 }
+        request_id: { type: string, format: uuid }
+        error:
+          type: object
+          additionalProperties: false
+          required: [category, code, message, span, retry, commit_outcome]
+          properties:
+            category: { type: string, description: See docs/error-codes.md }
+            code: { type: string, description: See docs/error-codes.md }
+            message: { type: string, description: Safe text. Never contains token, paths, stack traces or SQL literal values. }
+            span:
+              oneOf:
+                - { type: "null" }
+                - { type: object, required: [start, end], properties: { start: { type: integer, minimum: 0 }, end: { type: integer, minimum: 0 } } }
+            retry: { type: string, enum: [never, safe_after_fix, after_wait, after_restart] }
+            commit_outcome: { type: string, enum: [not_applicable, not_committed, uncertain] }
+    Health:
+      type: object
+      additionalProperties: false
+      required: [api_version, request_id, status, engine_version, format_version]
+      properties:
+        api_version: { const: v1 }
+        request_id: { type: string, format: uuid }
+        status: { type: string, enum: [ok, read_only_degraded, quarantined] }
+        engine_version: { type: string }
+        format_version: { type: integer }
+    Schema:
+      type: object
+      additionalProperties: false
+      required: [api_version, request_id, tables]
+      properties:
+        api_version: { const: v1 }
+        request_id: { type: string, format: uuid }
+        tables:
+          type: array
+          maxItems: 128
+          items:
+            type: object
+            required: [name, columns, primary_key, index]
+            properties:
+              name: { type: string }
+              columns: { type: array, items: { $ref: "#/components/schemas/Column" } }
+              primary_key: { type: string }
+              index:
+                oneOf:
+                  - { type: "null" }
+                  - { type: object, required: [name, column], properties: { name: { type: string }, column: { type: string } } }

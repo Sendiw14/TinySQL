@@ -1,0 +1,98 @@
+{
+  "adr": "ADR-03",
+  "header": [
+    [
+      0,
+      1,
+      "page_type",
+      2
+    ],
+    [
+      1,
+      1,
+      "flags",
+      0
+    ],
+    [
+      2,
+      4,
+      "page_id",
+      2
+    ],
+    [
+      6,
+      8,
+      "page_lsn",
+      3
+    ],
+    [
+      14,
+      2,
+      "free_start",
+      44
+    ],
+    [
+      16,
+      2,
+      "free_end",
+      4001
+    ],
+    [
+      18,
+      2,
+      "slot_count",
+      3
+    ],
+    [
+      20,
+      4,
+      "crc32c",
+      "computed"
+    ]
+  ],
+  "slots": [
+    {
+      "slot": 0,
+      "offset": 4061,
+      "len_flags": "0x0023",
+      "tombstone": false,
+      "row_hex": "0105000001000000000000000400416c6578cdcccccccccc0e4001ea07000000000000",
+      "values": [
+        1,
+        "Alex",
+        3.85,
+        true,
+        2026
+      ]
+    },
+    {
+      "slot": 1,
+      "offset": 4035,
+      "len_flags": "0x001A",
+      "tombstone": false,
+      "row_hex": "010500040200000000000000030053616d00e907000000000000",
+      "values": [
+        2,
+        "Sam",
+        null,
+        false,
+        2025
+      ]
+    },
+    {
+      "slot": 2,
+      "offset": 4001,
+      "len_flags": "0x8022",
+      "tombstone": true,
+      "row_hex": "01050000030000000000000003004b696dcdcccccccccc084001ea07000000000000",
+      "values": [
+        3,
+        "Kim",
+        3.1,
+        true,
+        2026
+      ]
+    }
+  ],
+  "values_note": "INTEGER values here are JSON numbers for readability; REAL bits: 3.85 = 0x400ECCCCCCCCCCCD"
+}

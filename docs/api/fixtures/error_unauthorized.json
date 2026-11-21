@@ -1,0 +1,29 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/query",
+    "headers": {
+      "Host": "127.0.0.1:8787",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "sql": "SELECT * FROM t"
+    }
+  },
+  "status": 401,
+  "body": {
+    "api_version": "v1",
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "error": {
+      "category": "http",
+      "code": "HTTP_UNAUTHORIZED",
+      "message": "missing or invalid bearer token",
+      "span": null,
+      "retry": "never",
+      "commit_outcome": "not_applicable"
+    }
+  },
+  "response_headers": {
+    "WWW-Authenticate": "Bearer"
+  }
+}

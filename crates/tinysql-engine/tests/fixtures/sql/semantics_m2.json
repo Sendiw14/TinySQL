@@ -1,0 +1,815 @@
+{
+  "adr": "ADR-02",
+  "status": "PROPOSED",
+  "milestone": "M2",
+  "note": "rows with ordered=false compare as multisets",
+  "cases": [
+    {
+      "name": "reference_journey_m2",
+      "steps": [
+        {
+          "sql": "CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT NOT NULL, gpa REAL, active BOOLEAN NOT NULL, year INTEGER)",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, gpa, active, year) VALUES (1, 'Alex', 3.85, TRUE, 2026)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, gpa, active, year) VALUES (2, 'Sam', NULL, FALSE, 2025)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "SELECT id, name FROM students WHERE gpa >= 3.50 ORDER BY id ASC LIMIT 50",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ],
+                [
+                  "name",
+                  "TEXT"
+                ]
+              ],
+              "rows": [
+                [
+                  "1",
+                  "Alex"
+                ]
+              ],
+              "ordered": true
+            }
+          }
+        },
+        {
+          "sql": "SELECT COUNT(*) FROM students WHERE active = TRUE",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "count",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "1"
+                ]
+              ],
+              "ordered": true
+            }
+          }
+        },
+        {
+          "sql": "BEGIN",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "UPDATE students SET gpa = 3.90 WHERE id = 1",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "SELECT gpa FROM students WHERE id = 1",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "gpa",
+                  "REAL"
+                ]
+              ],
+              "rows": [
+                [
+                  3.9
+                ]
+              ],
+              "ordered": true
+            }
+          }
+        },
+        {
+          "sql": "ROLLBACK",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "SELECT gpa FROM students WHERE id = 1",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "gpa",
+                  "REAL"
+                ]
+              ],
+              "rows": [
+                [
+                  3.85
+                ]
+              ],
+              "ordered": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "null_three_valued_logic",
+      "steps": [
+        {
+          "sql": "CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT NOT NULL, gpa REAL, active BOOLEAN NOT NULL, year INTEGER)",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, gpa, active, year) VALUES (1, 'Alex', 3.85, TRUE, 2026)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, gpa, active, year) VALUES (2, 'Sam', NULL, FALSE, 2025)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "SELECT id FROM students WHERE gpa = NULL",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [],
+              "ordered": false
+            }
+          }
+        },
+        {
+          "sql": "SELECT id FROM students WHERE gpa != 1.0",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "1"
+                ]
+              ],
+              "ordered": false
+            }
+          }
+        },
+        {
+          "sql": "SELECT id FROM students WHERE NOT gpa = 1.0",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "1"
+                ]
+              ],
+              "ordered": false
+            }
+          }
+        },
+        {
+          "sql": "SELECT id FROM students WHERE gpa IS NULL",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "2"
+                ]
+              ],
+              "ordered": false
+            }
+          }
+        },
+        {
+          "sql": "SELECT id FROM students WHERE gpa IS NOT NULL",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "1"
+                ]
+              ],
+              "ordered": false
+            }
+          }
+        },
+        {
+          "sql": "SELECT id FROM students WHERE gpa > 1.0 OR active = FALSE",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "1"
+                ],
+                [
+                  "2"
+                ]
+              ],
+              "ordered": false
+            }
+          }
+        },
+        {
+          "sql": "SELECT id FROM students WHERE NOT (gpa > 1.0 AND active = FALSE)",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "1"
+                ]
+              ],
+              "ordered": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ordering_nulls_last_ties_by_pk",
+      "steps": [
+        {
+          "sql": "CREATE TABLE t (id INTEGER PRIMARY KEY, v INTEGER)",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "INSERT INTO t (id, v) VALUES (3, 5)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "INSERT INTO t (id) VALUES (1)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "INSERT INTO t (id, v) VALUES (2, 5)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "INSERT INTO t (id, v) VALUES (-9223372036854775808, -1)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "SELECT id FROM t ORDER BY v ASC",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "-9223372036854775808"
+                ],
+                [
+                  "2"
+                ],
+                [
+                  "3"
+                ],
+                [
+                  "1"
+                ]
+              ],
+              "ordered": true
+            }
+          }
+        },
+        {
+          "sql": "SELECT id FROM t ORDER BY v DESC",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "2"
+                ],
+                [
+                  "3"
+                ],
+                [
+                  "-9223372036854775808"
+                ],
+                [
+                  "1"
+                ]
+              ],
+              "ordered": true
+            }
+          }
+        },
+        {
+          "sql": "SELECT id FROM t ORDER BY v DESC LIMIT 0",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [],
+              "ordered": true
+            }
+          }
+        },
+        {
+          "sql": "SELECT * FROM t WHERE id = -9223372036854775808",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ],
+                [
+                  "v",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "-9223372036854775808",
+                  "-1"
+                ]
+              ],
+              "ordered": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "strict_types_and_constraints",
+      "steps": [
+        {
+          "sql": "CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT NOT NULL, gpa REAL, active BOOLEAN NOT NULL, year INTEGER)",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, gpa, active, year) VALUES (1, 'Alex', 3.85, TRUE, 2026)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, gpa, active, year) VALUES (2, 'Sam', NULL, FALSE, 2025)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "SELECT id FROM students WHERE gpa >= 3",
+          "expect": {
+            "error": "TYPE_MISMATCH"
+          }
+        },
+        {
+          "sql": "SELECT id FROM students WHERE name = 1",
+          "expect": {
+            "error": "TYPE_MISMATCH"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, active) VALUES (3, 'Kim', 1)",
+          "expect": {
+            "error": "TYPE_MISMATCH"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, active) VALUES (1, 'Dup', TRUE)",
+          "expect": {
+            "error": "CONSTRAINT_PRIMARY_KEY"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, active) VALUES (NULL, 'N', TRUE)",
+          "expect": {
+            "error": "CONSTRAINT_NOT_NULL"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, active) VALUES (4, NULL, TRUE)",
+          "expect": {
+            "error": "CONSTRAINT_NOT_NULL"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name) VALUES (5, 'NoActive')",
+          "expect": {
+            "error": "INSERT_MISSING_REQUIRED"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, active) VALUES (6, 'X')",
+          "expect": {
+            "error": "INSERT_COLUMN_COUNT"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, id, name, active) VALUES (7, 7, 'X', TRUE)",
+          "expect": {
+            "error": "INSERT_DUPLICATE_COLUMN"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, active, nope) VALUES (8, 'X', TRUE, 1)",
+          "expect": {
+            "error": "UNKNOWN_COLUMN"
+          }
+        },
+        {
+          "sql": "UPDATE students SET id = 9 WHERE id = 1",
+          "expect": {
+            "error": "CONSTRAINT_PK_UPDATE"
+          }
+        },
+        {
+          "sql": "UPDATE students SET name = NULL WHERE id = 1",
+          "expect": {
+            "error": "CONSTRAINT_NOT_NULL"
+          }
+        },
+        {
+          "sql": "SELECT * FROM missing",
+          "expect": {
+            "error": "UNKNOWN_TABLE"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, active) VALUES (3, 'Kim', TRUE)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "SELECT COUNT(*) FROM students",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "count",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "3"
+                ]
+              ],
+              "ordered": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "schema_rules",
+      "steps": [
+        {
+          "sql": "CREATE TABLE a (x INTEGER)",
+          "expect": {
+            "error": "SCHEMA_PK_REQUIRED"
+          }
+        },
+        {
+          "sql": "CREATE TABLE a (x INTEGER PRIMARY KEY, y INTEGER PRIMARY KEY)",
+          "expect": {
+            "error": "SCHEMA_PK_REQUIRED"
+          }
+        },
+        {
+          "sql": "CREATE TABLE a (x TEXT PRIMARY KEY)",
+          "expect": {
+            "error": "SCHEMA_PK_NOT_INTEGER"
+          }
+        },
+        {
+          "sql": "CREATE TABLE a (x INTEGER PRIMARY KEY, X TEXT)",
+          "expect": {
+            "error": "DUPLICATE_COLUMN"
+          }
+        },
+        {
+          "sql": "CREATE TABLE a (x INTEGER PRIMARY KEY)",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "CREATE TABLE A (x INTEGER PRIMARY KEY)",
+          "expect": {
+            "error": "DUPLICATE_TABLE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "multi_row_mutation_atomic",
+      "steps": [
+        {
+          "sql": "CREATE TABLE t (id INTEGER PRIMARY KEY, n TEXT NOT NULL, v INTEGER)",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "INSERT INTO t (id, n, v) VALUES (1, 'a', 1)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "INSERT INTO t (id, n, v) VALUES (2, 'b', 1)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "UPDATE t SET v = 2 WHERE v = 1",
+          "expect": {
+            "affected": "2"
+          }
+        },
+        {
+          "sql": "UPDATE t SET n = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' WHERE v = 2",
+          "expect": {
+            "error": "LIMIT_ROW_TOO_LARGE"
+          }
+        },
+        {
+          "sql": "SELECT id, n FROM t WHERE v = 2 ORDER BY id ASC",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "id",
+                  "INTEGER"
+                ],
+                [
+                  "n",
+                  "TEXT"
+                ]
+              ],
+              "rows": [
+                [
+                  "1",
+                  "a"
+                ],
+                [
+                  "2",
+                  "b"
+                ]
+              ],
+              "ordered": true
+            }
+          }
+        },
+        {
+          "sql": "DELETE FROM t WHERE v = 2",
+          "expect": {
+            "affected": "2"
+          }
+        },
+        {
+          "sql": "DELETE FROM t WHERE v = 2",
+          "expect": {
+            "affected": "0"
+          }
+        }
+      ]
+    },
+    {
+      "name": "transaction_aborted_until_rollback",
+      "steps": [
+        {
+          "sql": "CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT NOT NULL, gpa REAL, active BOOLEAN NOT NULL, year INTEGER)",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, gpa, active, year) VALUES (1, 'Alex', 3.85, TRUE, 2026)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, gpa, active, year) VALUES (2, 'Sam', NULL, FALSE, 2025)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "COMMIT",
+          "expect": {
+            "error": "TXN_NOT_ACTIVE"
+          }
+        },
+        {
+          "sql": "BEGIN",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "BEGIN",
+          "expect": {
+            "error": "TXN_ALREADY_ACTIVE"
+          }
+        },
+        {
+          "sql": "SELECT id FROM students WHERE id = 1",
+          "expect": {
+            "error": "TXN_ABORTED"
+          }
+        },
+        {
+          "sql": "COMMIT",
+          "expect": {
+            "error": "TXN_ABORTED"
+          }
+        },
+        {
+          "sql": "ROLLBACK",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "BEGIN",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "DELETE FROM students WHERE id = 2",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "CREATE TABLE z (id INTEGER PRIMARY KEY)",
+          "expect": {
+            "error": "TXN_DDL_IN_TRANSACTION"
+          }
+        },
+        {
+          "sql": "ROLLBACK",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "SELECT COUNT(*) FROM students",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "count",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "2"
+                ]
+              ],
+              "ordered": true
+            }
+          }
+        },
+        {
+          "sql": "BEGIN",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "INSERT INTO students (id, name, active) VALUES (9, 'Read', TRUE)",
+          "expect": {
+            "affected": "1"
+          }
+        },
+        {
+          "sql": "SELECT name FROM students WHERE id = 9",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "name",
+                  "TEXT"
+                ]
+              ],
+              "rows": [
+                [
+                  "Read"
+                ]
+              ],
+              "ordered": true
+            }
+          }
+        },
+        {
+          "sql": "COMMIT",
+          "expect": {
+            "ok": true
+          }
+        },
+        {
+          "sql": "SELECT COUNT(*) FROM students",
+          "expect": {
+            "rows": {
+              "columns": [
+                [
+                  "count",
+                  "INTEGER"
+                ]
+              ],
+              "rows": [
+                [
+                  "3"
+                ]
+              ],
+              "ordered": true
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

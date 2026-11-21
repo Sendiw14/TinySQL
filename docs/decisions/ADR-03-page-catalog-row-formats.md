@@ -1,6 +1,6 @@
 # ADR-03 Page, catalog and row byte formats
 
-Status: PROPOSED — **not frozen**. Freezing requires golden binary fixtures and CRC vectors committed under `crates/tinysql-engine/tests/fixtures/format/` and owner review. M3 code is blocked until then.
+Status: PROPOSED — **not frozen**. Golden fixtures drafted 2026-11-22 in `crates/tinysql-engine/tests/fixtures/format/` (generator `scripts/fixtures/fmt.py`; CRCs re-verified by a separate decoder). Freezing requires owner review. M3 code is blocked until then.
 Author: Claude Opus 5.5 · Reviewer: owner + independent backend reviewer (pending) · Date: 2026-11-22
 Audit refs: AUD-02, AUD-09, AUD-10, AUD-22
 
@@ -71,7 +71,7 @@ A PK column is never NULL; a set NULL bit for PK or NOT NULL column is `CorruptF
 
 ### Catalog
 - Catalog root page ID in superblock. Catalog pages are slotted, chained by `next_page_id`. One record per table.
-- Table record: `table_id u32`, `name_len u8` + name, `column_count u16`, then per column `name_len u8` + name, `type u8` (1 INTEGER, 2 REAL, 3 TEXT, 4 BOOLEAN), `flags u8` (bit0 PK, bit1 NOT NULL, others 0); then `heap_first u32`, `heap_last u32`, `pk_root u32`, `has_index u8` (0/1), and if 1: `index_name_len u8` + name, `index_column u16`, `index_root u32`.
+- Table record: `table_id u32`, `name_len u8` + name, `column_count u16`, then per column `name_len u8` + name, `type u8` (1 INTEGER, 2 REAL, 3 TEXT, 4 BOOLEAN), `flags u8` (bit0 PK, bit1 NOT NULL, others 0; a PK column must have both bits set); then `heap_first u32`, `heap_last u32`, `pk_root u32`, `has_index u8` (0/1), and if 1: `index_name_len u8` + name, `index_column u16`, `index_root u32`.
 - DDL rewrites the affected catalog page(s) as full page images in one transaction. A table or index is visible only after that transaction commits, so a half-built index is never visible.
 - Limits: 128 tables, 64 columns/table, names 1–64 bytes ASCII lowercase. Exactly one INTEGER PK column.
 

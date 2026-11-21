@@ -1,0 +1,77 @@
+{
+  "adr": "ADR-04",
+  "header": [
+    [
+      0,
+      1,
+      "page_type",
+      4
+    ],
+    [
+      1,
+      1,
+      "flags",
+      0
+    ],
+    [
+      2,
+      4,
+      "page_id",
+      4
+    ],
+    [
+      6,
+      8,
+      "page_lsn",
+      3
+    ],
+    [
+      14,
+      2,
+      "free_start",
+      101
+    ],
+    [
+      16,
+      2,
+      "free_end",
+      4096
+    ],
+    [
+      18,
+      2,
+      "slot_count",
+      3
+    ],
+    [
+      20,
+      4,
+      "crc32c",
+      "computed"
+    ]
+  ],
+  "entry_size": 23,
+  "entries": [
+    {
+      "value": "2025",
+      "pk": "2",
+      "page": 2,
+      "slot": 1,
+      "inactive": false
+    },
+    {
+      "value": "2026",
+      "pk": "1",
+      "page": 2,
+      "slot": 0,
+      "inactive": false
+    },
+    {
+      "value": "2026",
+      "pk": "3",
+      "page": 2,
+      "slot": 2,
+      "inactive": true
+    }
+  ]
+}

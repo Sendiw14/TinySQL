@@ -1,0 +1,42 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/query",
+    "headers": {
+      "Host": "127.0.0.1:8787",
+      "Authorization": "Bearer <token>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "sql": "SELECT name FROM u"
+    }
+  },
+  "status": 200,
+  "body": {
+    "api_version": "v1",
+    "request_id": "00000000-0000-4000-8000-000000000001",
+    "result": {
+      "kind": "rows",
+      "columns": [
+        {
+          "name": "name",
+          "type": "TEXT",
+          "nullable": false
+        }
+      ],
+      "rows": [
+        [
+          "é漢 <script>'\""
+        ],
+        [
+          ""
+        ]
+      ]
+    },
+    "timing": {
+      "server_elapsed_us": "<decimal string>",
+      "measured": "engine execute, server clock"
+    },
+    "warnings": []
+  }
+}
